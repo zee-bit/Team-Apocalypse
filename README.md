@@ -9,7 +9,7 @@ The Idea is to design a computer application that is capable of running in backg
 
 The Timeline as well as description can be found here: 
 <!-- blank line -->
-<figure>
-  <iframe src="https://docs.google.com/document/d/e/2PACX-1vT8Jwb-iPuf1YkDyxVNYOAmkzhi0xBpSMXFhNXVCOMz38xVizGUslfYuSLZLuGqKq-y0hSASAlwQvAY/pub?embedded=true" frameborder="0" allowfullscreen="true"> </iframe>
-</figure>
+<a href="https://docs.google.com/document/d/e/2PACX-1vT8Jwb-iPuf1YkDyxVNYOAmkzhi0xBpSMXFhNXVCOMz38xVizGUslfYuSLZLuGqKq-y0hSASAlwQvAY/pub?embedded=true">
+  <img src="src/timeline.png">
+</a>
 <!-- blank line -->
