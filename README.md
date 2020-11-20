@@ -10,6 +10,6 @@ The Idea is to design a computer application that is capable of running in backg
 The Timeline as well as description can be found here: 
 <!-- blank line -->
 <a href="https://docs.google.com/document/d/e/2PACX-1vT8Jwb-iPuf1YkDyxVNYOAmkzhi0xBpSMXFhNXVCOMz38xVizGUslfYuSLZLuGqKq-y0hSASAlwQvAY/pub?embedded=true">
-  <img src="src/timeline.png">
+  <img src="src/frame.png">
 </a>
 <!-- blank line -->
