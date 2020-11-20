@@ -35,3 +35,19 @@ function startModel() {
 function stopModel() {
 
 }
+
+// Testing audio stream here
+const { desktopCapturer } = require('electron')
+
+const constraints = {
+    audio: {
+        mandatory: {
+            chromeMediaSource: 'desktop'
+        }
+    },
+    video: false
+}
+
+desktopCapturer.getSources({types: ['window', 'screen']}).then(async sources => {
+    
+})
