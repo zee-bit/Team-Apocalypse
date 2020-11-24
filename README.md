@@ -4,12 +4,13 @@ The Idea is to design a computer application that is capable of running in backg
 
 #### Tech Stacks:
 - ElectronJS
+- Flask
 - WebRTC
 - Deep Learning - LSTM
 
 The Timeline as well as description can be found here: 
 <!-- blank line -->
 <a href="https://docs.google.com/document/d/e/2PACX-1vT8Jwb-iPuf1YkDyxVNYOAmkzhi0xBpSMXFhNXVCOMz38xVizGUslfYuSLZLuGqKq-y0hSASAlwQvAY/pub?embedded=true">
-  <img src="src/frame.png">
+  <img src="frontend/media/frame.png">
 </a>
 <!-- blank line -->
