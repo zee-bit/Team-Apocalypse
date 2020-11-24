@@ -1,0 +1,71 @@
+/* because I love Ubuntu font */
+@import url("https://fonts.googleapis.com/css2?family=Ubuntu&display=swap");
+
+body {
+  font-family: "Ubuntu", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  margin: 10px auto;
+  text-align: center;
+  padding-top: 80px;
+  background-color: floralwhite;
+}
+
+.header {
+  padding-bottom: 15px;
+}
+
+.text {
+  text-align: center;
+  overflow-y: scroll;
+  font-size: x-large;
+  font-weight: bold;
+  padding-top: 10px;
+  font-family: monospace;
+  height: 300px;
+  width: 100%;
+}
+
+.toggle {
+  text-align: center;
+}
+
+.toggle label {
+  position: relative;
+  display: inline-block;
+  width: 80px;
+  height: 80px;
+  background-color: #57de72;
+  border-radius: 50px;
+  cursor: pointer;
+  box-shadow: inset 0 0 2px 1px rgba(0, 0, 0, 0.1), 0px 9px 15px 0px rgba(3, 132, 28, 0.5411764705882353);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.toggle label:before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.2s cubic-bezier(0, -1.85, 0.27, 1.75);
+  width: 10px;
+  height: 42px;
+  background-color: #fff;
+  border-radius: 46px;
+  box-shadow: inset 0px 0px 0px 8px #fff;
+}
+
+.toggle input {
+  display: none;
+}
+
+.toggle input:checked + label {
+  background-color: #fd1015;
+  box-shadow: inset 0 0 2px 1px rgba(0, 0, 0, 0.1), 0px 9px 15px 0px #ef4247;
+}
+
+.toggle input:checked + label:before {
+  height: 42px;
+  width: 42px;
+  border-radius: 46px;
+  background-color: #fd0f14;
+}
