@@ -2,23 +2,23 @@
 ## Speech-To-Text App
 The Idea is to design a computer application that is capable of running in background while converting audio output to a text-based output. This can be handy for virtual meetings where you need to cache the tasks assigned to members of your organization, to save/highlight certain deadlines, or even dislpay subtitles. We are also thinking of implementing a feature to save the video/audio for later use.
 
-
 <div>
-    <img src="frontend/media/electron.png" height="180px" width="180px">
+    <div style="display: inline-block;">
+        <img src="frontend/media/electron.png" height="180px" width="180px">
+    </div>
+    <div style="display: inline-block;">
+        <img src="frontend/media/flask.png" height="180px" width="230px">
+    </div>
+    <div style="display: inline-block;">
+        <img src="frontend/media/tensorflow.png" height="180px" width="210px">
+    </div>
 </div>
-<div>
-    <img src="frontend/media/flask.png" height="180px" width="230px">
-</div>
-<div>
-    <img src="frontend/media/tensorflow.png" height="180px" width="210px">
-</div>
-
 
 #### Tech Stacks:
 - ElectronJS
 - Flask
 - WebRTC
-- Deep Learning - LSTM
+- Deep Learning
 
 The Timeline as well as description can be found here: 
 <!-- blank line -->
