@@ -7,10 +7,10 @@ The Idea is to design a computer application that is capable of running in backg
     <img src="frontend/media/electron.png" height="180px" width="180px">
 </div>
 <div>
-    <img src="frontend/media/flask.png" height="180px" width="250px">
+    <img src="frontend/media/flask.png" height="180px" width="230px">
 </div>
 <div>
-    <img src="frontend/media/tensorflow.png" height="180px" width="220px">
+    <img src="frontend/media/tensorflow.png" height="180px" width="210px">
 </div>
 
 
