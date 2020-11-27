@@ -1,39 +1,24 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8">
-    <title>Speech-to-Text</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
-    <link rel="stylesheet" href="index.css">
-  </head>
-  <body>
-    <nav class="navbar navbar-dark bg-dark fixed-top">
-      <a class="navbar-brand" href="#">
-        <img src="https://cloud.google.com/images/products/speech/speech-api-lead.png" width="55" height="30" class="d-inline-block align-top" alt="">
-        <span>Speech-to-Text</span>
-      </a>
-    </nav>
 
-    <div class="container">
-      <div class="row">
-        <div class="col">
-          <div class="card text text-muted" id="text_container">
-            
-          </div>
-        </div>
-      </div>
+<head>
+  <meta charset="UTF-8">
+  <title>Hello World!</title>
+  <link rel="stylesheet" href="index.css">
+  <script defer src="./render.js"></script>
+</head>
 
-      <div class="row py-5">
-          <div class="col toggle">
-            <audio id="startAudio" src="../media/start.ogg"></audio>
-            <audio id="stopAudio" src="../media/stop.ogg"></audio>
-            <input type="checkbox" id="toggle" />
-            <label for="toggle" onclick="toggleAudio()"></label>
-          </div>
-      </div>
+<body>
+  <h1>Screen Recording App</h1>
+  <h1>
+    <button id='getSourcesBtn'>Get Video Sources 📸</button>
+  </h1>
+  <video src="" width="100%" muted="true"></video>
+  <h1>
+    <button id='startBtn' disabled="true">Start ⏺</button>
+    <button id='pauseBtn' disabled="true">Pause ⏸</button>
+    <button id='stopBtn' disabled="true">Stop ⏹</button>
+  </h1>
+</body>
 
-    </div>
-
-    <script src="render.js"></script>
-  </body>
 </html>
