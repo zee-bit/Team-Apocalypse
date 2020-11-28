@@ -1,5 +1,8 @@
-const { app, BrowserWindow } = require('electron');
-const path = require('path');
+const { app, BrowserWindow, ipcMain } = require('electron')
+const path = require('path')
+const { DISPLAY_SOURCES, SAVE_PATH } = require('./actions/ipcChannels')
+const { handleSaveVideo } = require('./actions/saveVideo')
+const { handleDisplaySources } = require('./actions/displaySources')
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
@@ -9,12 +12,11 @@ if (require('electron-squirrel-startup')) { // eslint-disable-line global-requir
 const createWindow = () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 620,
+    width: 1000,
+    height: 600,
     webPreferences: {
       nodeIntegration: true,
-      enableRemoteModule: true,
-    },
+    }
   });
 
   // and load the index.html of the app.
@@ -48,3 +50,33 @@ app.on('activate', () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+ipcMain.handle(DISPLAY_SOURCES, handleDisplaySources)
+ipcMain.handle(SAVE_PATH, handleSaveVideo)
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+// Live reload using electron-reload
+require('electron-reload')(__dirname, {
+  electron: require('../node_modules/electron'),
+  // electron: require(`${__dirname}/../node_modules/electron`)
+  // electron: path.join(__dirname, '/../node_modules/electron'),
+  hardResetMethod: 'exit',
+  forceHardReset: true
+});
+
+// Live reload using electron-reloader
+// Both electron and content
+// try {
+//   require('electron-reloader')(module)
+// } catch (_) {}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
