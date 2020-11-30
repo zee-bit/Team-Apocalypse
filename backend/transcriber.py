@@ -3,8 +3,8 @@ import numpy as np
 import time
 import wave
 
-model_file_path = 'deepspeech-0.8.1-models.pbmm'
-scorer_file_path = 'deepspeech-0.8.1-models.scorer'
+model_file_path = '../deepspeech-0.8.1-models.pbmm'
+scorer_file_path = '../deepspeech-0.8.1-models.scorer'
 lm_alpha = 0.75
 lm_beta = 1.85
 beam_width = 500
