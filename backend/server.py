@@ -1,31 +1,23 @@
-import os, random
-from flask import Flask, request, jsonify
-'''
-    Import the DL model class here!! 
-'''
+from flask import Flask, request, jsonify,current_app
+import random
+import os
+from transcriber import TRANSCRIBING_SERVICE
 
-# Create a flask application
-app = Flask(__name__)
+app=Flask(__name__)
 
-@app.route('/predict', methods=["POST"])
-def predict():
-    # get audio file and save it temporarily
-    audioFile = request.files["file"]
-    fileName = str(random.randint(10000, 100000))
-    audioFile.save(fileName)
 
-    # invoke DL model class here 
-    # [Use constructor of class for faster subsequent prediction]
+@app.route("/transcribe", methods=["POST"])
+def transcribe():
 
-    # make prediction
 
-    # remove temporary audioFile
-    os.remove(audioFile)
+	audio_file_path=request.data
 
-    # send the prediction back to client
-    prediction = {}
-    return jsonify(prediction)
-    pass
+	ts=TRANSCRIBING_SERVICE()
+	transcribed_text=ts.transcribe(audio_file_path.decode('ascii'))
 
-if __name__ == "__main__":
-    app.run(debug=False)
+	result={"keyword": transcribed_text}
+
+	return jsonify(result)
+
+if __name__=="__main__":
+	app.run(debug=False)
