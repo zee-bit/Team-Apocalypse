@@ -82,8 +82,13 @@ typings/
 # DynamoDB Local files
 .dynamodb/
 
+# virtual-env
+venv/
+
 # Webpack
 .webpack/
 
 # Electron-Forge
 out/
+
+__pycache__/
