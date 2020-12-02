@@ -1,5 +1,5 @@
 const { ipcRenderer } = require('electron') // For IPC
-const { DISPLAY_SOURCES, SAVE_PATH } = require('./actions/ipcChannels') // Main Procsses name constants
+const { DISPLAY_SOURCES, SAVE_PATH } = require('../actions/ipcChannels') // Main Procsses name constants (path relative to the html file)
 const { writeFile } = require('fs') // Save video to disk
 
 // DOM Elements
@@ -111,6 +111,8 @@ const setUpRecorder = (stream) => {
 
   // Register event handlers
   mediaRecorder.ondataavailable = handleDataAvailable
+  mediaRecorder.onpause = handleRecordingPause
+  mediaRecorder.onresume = handleRecordingResume
   mediaRecorder.onstop = handleRecordingStopped
 }
 
@@ -118,6 +120,14 @@ const setUpRecorder = (stream) => {
 
 const handleDataAvailable = async (e) => {
   chunks.push(e.data)
+}
+
+const handleRecordingPause = async (e) => {
+  return
+}
+
+const handleRecordingResume = async (e) => {
+  return
 }
 
 const handleRecordingStopped = async (e) => {
