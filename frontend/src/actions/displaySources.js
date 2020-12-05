@@ -8,7 +8,11 @@ onSelectSource = (source) => {
   return {
     "name": source.name,
     "constraints": {
-      audio: false,
+      audio: {
+        mandatory: {
+          chromeMediaSource: 'desktop'
+        }
+      },
       video: {
         mandatory: {
           chromeMediaSource: 'desktop',
