@@ -23,7 +23,6 @@ const createWindow = () => {
   mainWindow.loadFile(path.join(__dirname, 'index.html'));
 
   // Open the DevTools.
-<<<<<<< HEAD
   // mainWindow.webContents.openDevTools();
 
   ipcMain.on('sudo-enlarge', (event, arg) => {
@@ -34,10 +33,6 @@ const createWindow = () => {
     mainWindow.setSize(1000, 650)
   })
 };
-=======
-  mainWindow.webContents.openDevTools();
-}
->>>>>>> 000121f4075505dba2c57d7936129de5afbed6ba
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
