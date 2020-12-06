@@ -6,12 +6,12 @@ const { PythonShell } = require("python-shell") // Run python scripts
 
 // DOM Elements
 
-const newRecordingBtn = document.getElementById("newRecordingBtn")
 const getSourcesBtn = document.getElementById("getSourcesBtn")
 const startBtn = document.getElementById("startBtn")
 const pauseBtn = document.getElementById("pauseBtn")
 const stopBtn = document.getElementById("stopBtn")
 const saveBtn = document.getElementById("saveBtn")
+const newRecordingBtn = document.getElementById("newRecordingBtn")
 const videoElement = document.getElementsByTagName("video")[0]
 const transcribedTextElement = document.getElementById("transcribedTextElement")
 const finalTranscribedTextElement = document.getElementById("finalTranscribedTextElement")
@@ -57,6 +57,7 @@ guiUpdateOnStart = () => {
   startBtn.setAttribute("disabled", "true")
   pauseBtn.removeAttribute("disabled")
   stopBtn.removeAttribute("disabled")
+  newRecordingBtn.removeAttribute("disabled")
 }
 
 guiUpdateOnSourceAvailable = (videoStream, sourceName) => {
@@ -67,7 +68,7 @@ guiUpdateOnSourceAvailable = (videoStream, sourceName) => {
 }
 
 guiUpdateOnSourceUnavailable = error => {
-  console.log(error)
+  alert("Could not find the Source. Please select again.")
   guiUpdateOnNew()
 }
 
@@ -80,6 +81,7 @@ guiUpdateOnNew = () => {
   pauseBtn.setAttribute("disabled", "true")
   stopBtn.setAttribute("disabled", "true")
   saveBtn.setAttribute("disabled", "true")
+  newRecordingBtn.setAttribute("disabled", "true")
   transcribedTextElement.innerHTML = ""
   finalTranscribedTextElement.innerHTML = ""
 }
@@ -143,14 +145,13 @@ const handleDisplayTranscribed = (transcribedText, chunkIndex) => {
     transcribedTextElement.innerHTML = transcribedTextElement.innerHTML + " " + transcribedText
   else {
     finalTranscribedTextElement.innerHTML = transcribedText
-    console.log(finalTranscribedText, wavDurations)
+    console.log(finalTranscribedText)
   }
   finalTranscribedText[chunkIndex] = transcribedText
 }
 
 handleLastWavDuration = (duration, chunkIndex) => {
   wavDurations[chunkIndex] = parseFloat(duration)
-  console.log(chunkIndex, "Duration", parseFloat(duration))
   totalDuration += parseFloat(duration)
   return
 }
@@ -249,7 +250,6 @@ saveLecture = (e, savePath) => {
   if (savePath != '') {
     if (savePath.slice(-4) != ".mp4")
       savePath += ".mp4"
-    console.log("Save Path (", typeof (savePath), ")=", savePath)
     saveAsMp4(finalFilePaths[0], savePath)
   }
   return

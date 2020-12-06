@@ -3,29 +3,39 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Lecture Recording</title>
+  <title>Lecture Mode</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
   <link rel="stylesheet" href="./mode-lecture.css">
   <script defer src="./mode-lecture-render.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
 </head>
 
 <body>
-  <h1>Screen Recording App</h1>
-  <div style="float: right;">
-    <a class="btn btn-info" href="../index.html">Back</a>
+  <nav class="navbar navbar-dark bg-dark fixed-top">
+    <a class="navbar-brand" href="#">TextronAI</a>
+    <span class="navbar-text">Screen Recorder</span>
+  </nav>
+  <div class="container">
+    <div style="float: right;">
+      <a class="btn btn-dark" href="../index.html">Back</a>
+    </div>
+    <div class="row pb-1">
+      <button class="btn btn-warning" id='getSourcesBtn'>Get Video Sources 📸</button>
+    </div>
+    <div class="row justify-content-center py-2">
+      <video class='video-container' src="" width="85%" muted="true"></video>
+    </div>
+    <div class="row pt-1 justify-content-center">
+      <button class="btn btn-primary mt-3" id='startBtn' disabled="true">Start ⏺</button>
+      <div class="px-3"><button class="btn btn-info mt-3" id='pauseBtn' disabled="true">Pause ⏸</button></div>
+      <button class="btn btn-danger mt-3" id='stopBtn' disabled="true">Stop ⏹</button>
+      <div class="px-3"><button class="btn btn-info mt-3" id='saveBtn' disabled="true">Save Recording 💾</button></div>
+      <button class="btn btn-danger mt-3" id="newRecordingBtn" disabled="true">Start New Recording 🗑</button>
+    </div>
+    <div id="transcribedTextElement"></div>
+    <div id="finalTranscribedTextElement"></div>
   </div>
-  <h1>
-    <button id="newRecordingBtn">Start New Recording 🗑</button>
-    <button id='getSourcesBtn'>Select Video Source 📸</button>
-  </h1>
-  <video src="" width="100%" muted="true"></video>
-  <h1>
-    <button id='startBtn' disabled="true">Start ⏺</button>
-    <button id='pauseBtn' disabled="true">Pause ⏸</button>
-    <button id='stopBtn' disabled="true">Stop ⏹</button>
-    <button id='saveBtn' disabled="true">Save Lecture 💾</button>
-  </h1>
-  <div id="transcribedTextElement"></div>
-  <div id="finalTranscribedTextElement"></div>
 </body>
 
 </html>
