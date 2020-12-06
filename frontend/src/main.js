@@ -1,6 +1,6 @@
-const { app, BrowserWindow, ipcMain } = require('electron')
 const path = require('path')
-const { DISPLAY_SOURCES, SAVE_PATH } = require('./actions/ipcChannels')
+const { app, BrowserWindow, ipcMain, screen } = require('electron')
+const { DISPLAY_SOURCES, SAVE_PATH, SUDO_DOCKED, SUDO_ENLARGE, SUDO_SHRINK } = require('./actions/ipcChannels')
 const { handleSavePath, exitDialog } = require('./actions/dialogs')
 const { handleDisplaySources } = require('./actions/displaySources')
 
@@ -9,13 +9,15 @@ if (require('electron-squirrel-startup')) { // eslint-disable-line global-requir
   app.quit();
 }
 
+let mainWindow
+
 const createWindow = () => {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 1000,
     height: 650,
     autoHideMenuBar: true,
-    // frame: false,
+    frame: false,
     webPreferences: {
       nodeIntegration: true,
     }
@@ -26,18 +28,6 @@ const createWindow = () => {
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools();
-
-  ipcMain.on('sudo-enlarge', (event, arg) => {
-    mainWindow.setSize(2000, 1500)
-  })
-
-  ipcMain.on('sudo-shrink', (event, arg) => {
-    mainWindow.setSize(1000, 650)
-  })
-
-  ipcMain.on('sudo-docked', (event, arg) => {
-    mainWindow.setSize(630, 500)
-  })
 };
 
 // This method will be called when Electron has finished
@@ -69,9 +59,22 @@ app.on('activate', () => {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
 ipcMain.handle(DISPLAY_SOURCES, handleDisplaySources)
 ipcMain.handle(SAVE_PATH, handleSavePath)
+
+resizeAndCentre = (w, h) => {
+  let { width, height } = screen.getPrimaryDisplay().workAreaSize
+  mainWindow.setBounds({ x: Math.floor((width - w) / 2), y: Math.floor((height - h) / 2), width: w, height: h })
+}
+
+ipcMain.handle(SUDO_ENLARGE, (event, arg) => {
+  let { width, height } = screen.getPrimaryDisplay().workAreaSize
+  mainWindow.setBounds({ x: 50, y: 50, width: width - 100, height: height - 100 })
+})
+
+ipcMain.handle(SUDO_SHRINK, (event, arg) => resizeAndCentre(1000, 650))
+
+ipcMain.handle(SUDO_DOCKED, (event, arg) => resizeAndCentre(630, 200))
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////

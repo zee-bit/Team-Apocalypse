@@ -18,32 +18,21 @@
   <nav class="navbar navbar-dark bg-dark fixed-top">
     <span class="navbar-brand" href="#">TextronAI</span>
     <span class="navbar-text">Screen Recorder</span>
-    <div style="float: right;">
+    <div class="float-right">
       <a class="btn btn-dark" id="back-button" href="../index.html">Back</a>
     </div>
   </nav>
   <div class="container-fluid">
-    <!-- <div class="row pb-1">
-      <button class="btn btn-warning" id='getSourcesBtn'>Get Video Sources 📸</button>
-    </div>
-    <div class="row justify-content-center py-2">
-      <video class='video-container' src="" width="85%" muted="true"></video>
-    </div>
-    <div class="row pt-1 justify-content-center">
-      <button class="btn btn-primary" id='startBtn' disabled="true">Start ⏺</button>
-      <div class="px-3"><button class="btn btn-info" id='pauseBtn' disabled="true">Pause ⏸</button></div>
-      <button class="btn btn-danger" id='stopBtn' disabled="true">Stop ⏹</button>
-    </div> -->
     <div class="row">
-      <div class="col-lg-8 col-xl-8">
+      <div class="col-6 col-sm-6 col-md-6 col-lg-8 col-xl-8">
         <div class="lecture-container">
           <div class="">
-            <button class="btn btn-warning" id='getSourcesBtn'>Get Video Sources 📸</button>
-            <div id="timeKeeper" class="float-right btn btn-info">
+            <button class="btn btn-warning mt-2 mb-2" id='getSourcesBtn'>Get Video Sources 📸</button>
+            <div id="timeKeeper" class="btn btn-info  mt-2 mb-2">
               <span id="hours">00</span>:<span id="minutes">00</span>:<span id="seconds">00.0</span>
             </div>
           </div>
-          <div class="row justify-content-center py-2">
+          <div class="row justify-content-center py-2  mt-2 mb-2">
             <video class='video-container' src="" width="95%" muted="true"></video>
           </div>
           <div class="row pt-1 justify-content-center">
@@ -59,7 +48,7 @@
         <h4>Final Transcription</h4>
         <div class="container" id="finalTranscribedTextElement"></div>
       </div>
-      <div class="col-lg-4 col-xl-4">
+      <div class="col-6 col-sm-6 col-sm-6 col-lg-4 col-xl-4">
         <div class="editor-container" id="editor-container"></div>
         <div class="row justify-content-center pt-2">
           <button id="btn-save" class="btn btn-success" onclick="saveRichText()">Save Text</button>
