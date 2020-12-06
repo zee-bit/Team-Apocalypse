@@ -4,6 +4,9 @@ const { DISPLAY_SOURCES, SAVE_PATH } = require('../actions/ipcChannels') // Main
 const { writeFile } = require('fs') // Save video to disk
 const { PythonShell } = require("python-shell") // Run python scripts
 
+// Resize window
+ipcRenderer.send('sudo-enlarge')
+
 // DOM Elements
 
 const getSourcesBtn = document.getElementById("getSourcesBtn")
@@ -13,6 +16,7 @@ const stopBtn = document.getElementById("stopBtn")
 const saveBtn = document.getElementById("saveBtn")
 const newRecordingBtn = document.getElementById("newRecordingBtn")
 const videoElement = document.getElementsByTagName("video")[0]
+const backButton = document.getElementById("back-button")
 const transcribedTextElement = document.getElementById("transcribedTextElement")
 const finalTranscribedTextElement = document.getElementById("finalTranscribedTextElement")
 
@@ -114,6 +118,10 @@ pauseBtn.onclick = e => {
 startBtn.onclick = e => {
   mediaRecorder.start(timeslice)
   guiUpdateOnStart()
+}
+
+backButton.onclick = e => {
+  ipcRenderer.send('sudo-shrink')
 }
 
 getSourcesBtn.onclick = (event) => ipcRenderer.invoke(DISPLAY_SOURCES)

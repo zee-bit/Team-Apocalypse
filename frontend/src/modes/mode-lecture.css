@@ -3,3 +3,8 @@ body {
     margin-top: 2.7rem;
     padding: 1.5rem;
   }
+
+.editor-container {
+    width: 100%;
+    min-height: 70vh;
+}
