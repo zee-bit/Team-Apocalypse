@@ -32,6 +32,10 @@ const createWindow = () => {
   ipcMain.on('sudo-shrink', (event, arg) => {
     mainWindow.setSize(1000, 650)
   })
+
+  ipcMain.on('sudo-docked', (event, arg) => {
+    mainWindow.setSize(630, 500)
+  })
 };
 
 // This method will be called when Electron has finished
