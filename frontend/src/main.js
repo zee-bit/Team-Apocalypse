@@ -1,7 +1,7 @@
 const { app, BrowserWindow, ipcMain } = require('electron')
 const path = require('path')
 const { DISPLAY_SOURCES, SAVE_PATH } = require('./actions/ipcChannels')
-const { handleSaveVideo } = require('./actions/saveVideo')
+const { handleSavePath, exitDialog } = require('./actions/dialogs')
 const { handleDisplaySources } = require('./actions/displaySources')
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -23,8 +23,8 @@ const createWindow = () => {
   mainWindow.loadFile(path.join(__dirname, 'index.html'));
 
   // Open the DevTools.
-  // mainWindow.webContents.openDevTools();
-};
+  mainWindow.webContents.openDevTools();
+}
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -57,7 +57,7 @@ app.on('activate', () => {
 
 
 ipcMain.handle(DISPLAY_SOURCES, handleDisplaySources)
-ipcMain.handle(SAVE_PATH, handleSaveVideo)
+ipcMain.handle(SAVE_PATH, handleSavePath)
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
