@@ -16,7 +16,7 @@
 
 <body>
   <nav class="navbar navbar-dark bg-dark fixed-top">
-    <a class="navbar-brand" href="#">TextronAI</a>
+    <span class="navbar-brand" href="#">TextronAI</span>
     <span class="navbar-text">Screen Recorder</span>
     <div style="float: right;">
       <a class="btn btn-dark" id="back-button" href="../index.html">Back</a>
@@ -44,15 +44,17 @@
             <video class='video-container' src="" width="95%" muted="true"></video>
           </div>
           <div class="row pt-1 justify-content-center">
-            <button class="btn btn-primary" id='startBtn' disabled="true">Start ⏺</button>
-            <div class="px-3"><button class="btn btn-info" id='pauseBtn' disabled="true">Pause ⏸</button></div>
-            <button class="btn btn-danger" id='stopBtn' disabled="true">Stop ⏹</button>
-            <div class="px-3"><button class="btn btn-info" id='saveBtn' disabled="true">Save Recording 💾</button></div>
-            <button class="btn btn-danger" id="newRecordingBtn" disabled="true">Start New Recording 🗑</button>
+            <button class="btn btn-primary mt-2 mb-2" id='startBtn' disabled="true">Start ⏺</button>
+            <div class="px-3"><button class="btn btn-info mt-2 mb-2" id='pauseBtn' disabled="true">Pause ⏸</button></div>
+            <button class="btn btn-danger mt-2 mb-2" id='stopBtn' disabled="true">Stop ⏹</button>
+            <div class="px-3"><button class="btn btn-info mt-2 mb-2" id='saveBtn' disabled="true">Save Recording 💾</button></div>
+            <button class="btn btn-danger mt-2 mb-2" id="newRecordingBtn" disabled="true">Start New Recording 🗑</button>
           </div>
         </div>
-        <div id="transcribedTextElement"></div>
-        <div id="finalTranscribedTextElement"></div>
+        <h4>Live Transcription</h4>
+        <div class="container" id="transcribedTextElement"></div>
+        <h4>Final Transcription</h4>
+        <div class="container" id="finalTranscribedTextElement"></div>
       </div>
       <div class="col-lg-4 col-xl-4">
         <div class="editor-container" id="editor-container"></div>
