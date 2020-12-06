@@ -3,6 +3,9 @@ const path = require('path') // For joining paths
 const { DISPLAY_SOURCES, SAVE_PATH } = require('../actions/ipcChannels') // Main Procsses name constants (path relative to the html file)
 const { writeFile } = require('fs') // Save video to disk
 const { PythonShell } = require("python-shell") // Run python scripts
+// const { stopwatch } = require('./components/stopwatch')
+const { timeStamp } = require('console')
+
 
 // Resize window
 ipcRenderer.send('sudo-enlarge')
@@ -19,6 +22,9 @@ const videoElement = document.getElementsByTagName("video")[0]
 const backButton = document.getElementById("back-button")
 const transcribedTextElement = document.getElementById("transcribedTextElement")
 const finalTranscribedTextElement = document.getElementById("finalTranscribedTextElement")
+const hoursElement = document.getElementById("hours")
+const minutesElement = document.getElementById("minutes")
+const secondsElement = document.getElementById("seconds")
 
 // Global Variables
 
@@ -29,9 +35,58 @@ let tempDirectory = path.join(__dirname, "../../../backend/temp/")
 let scriptDirectory = path.join(__dirname, "../../../backend/scripts/")
 let sliceIndex = -1
 let totalDuration = 0
-let wavDurations = {}
 let finalTranscribedText = {}
 let finalFilePaths = []
+
+
+
+
+
+
+// ----------------------Stopwatch Variables----------------------
+
+let refreshInterval = 150
+let baseTime = 0
+let timeElapsedTillPause = 0
+
+timeKeeperReset = () => {
+  baseTime = 0
+  timeElapsedTillPause = 0
+  timeKeeperUpdateElements(["00", "00", "00.0"])
+}
+
+timeKeeperGetTimeElapsed = () => {
+  let elapsedTime = Date.now() - baseTime + timeElapsedTillPause
+  return [
+    Math.floor(elapsedTime / (1000 * 60 * 60)),
+    Math.floor((elapsedTime % (1000 * 60 * 60)) / (1000 * 60)),
+    ((elapsedTime % (1000 * 60)) / 1000).toFixed(1)
+  ]
+}
+
+timeKeeperUpdateElements = (data = timeKeeperGetTimeElapsed()) => {
+  hoursElement.innerText = data[0]
+  minutesElement.innerText = data[1]
+  secondsElement.innerText = data[2]
+}
+
+timeKeeperResume = () => {
+  baseTime = Date.now()
+  timeKeeper = setInterval(timeKeeperUpdateElements, refreshInterval)
+}
+
+timeKeeperStop = () => {
+  timeElapsedTillPause += Date.now() - baseTime
+  clearInterval(timeKeeper)
+}
+
+timeKeeperStart = (interval = refreshInterval) => {
+  refreshInterval = interval
+  baseTime = Date.now()
+  timeElapsedTillPause = 0
+  timeKeeper = setInterval(timeKeeperUpdateElements, refreshInterval)
+}
+
 
 
 
@@ -77,9 +132,7 @@ guiUpdateOnSourceUnavailable = error => {
 }
 
 guiUpdateOnNew = () => {
-  // videoElement.srcObject = null
   getSourcesBtn.removeAttribute("disabled")
-  // getSourcesBtn.innerText = "Select Video Source 📸"
   if (mediaRecorder != undefined)
     startBtn.removeAttribute("disabled")
   pauseBtn.setAttribute("disabled", "true")
@@ -88,6 +141,7 @@ guiUpdateOnNew = () => {
   newRecordingBtn.setAttribute("disabled", "true")
   transcribedTextElement.innerHTML = ""
   finalTranscribedTextElement.innerHTML = ""
+  timeKeeperReset()
 }
 
 
@@ -116,7 +170,10 @@ pauseBtn.onclick = e => {
 }
 
 startBtn.onclick = e => {
-  mediaRecorder.start(timeslice)
+  if (timeslice)
+    mediaRecorder.start(timeslice)
+  else
+    mediaRecorder.start()
   guiUpdateOnStart()
 }
 
@@ -134,7 +191,6 @@ handleNewRecording = (event) => {
   chunks = []
   sliceIndex = -1
   totalDuration = 0
-  wavDurations = {}
   finalTranscribedText = {}
   guiUpdateOnNew()
 }
@@ -159,7 +215,6 @@ const handleDisplayTranscribed = (transcribedText, chunkIndex) => {
 }
 
 handleLastWavDuration = (duration, chunkIndex) => {
-  wavDurations[chunkIndex] = parseFloat(duration)
   totalDuration += parseFloat(duration)
   return
 }
@@ -313,40 +368,33 @@ const convertToBuffer = async (chunks, startTime, chunkIndex) => {
 
 
 
-// Get startTime
-
-const getStartTime = (chunkIndex) => {
-  return totalDuration.toFixed(3)
-}
-
-
-
-
-
-
 // Media Recorder Event Handlers
 
 const handleRecordingStart = (e) => {
+  timeKeeperStart()
   return
 }
 
 const handleDataAvailable = (e) => {
   sliceIndex++
   chunks.push(e.data)
-  convertToBuffer(chunks, getStartTime(sliceIndex), sliceIndex)
+  convertToBuffer(chunks, totalDuration.toFixed(3), sliceIndex)
   return
 }
 
 const handleRecordingPause = (e) => {
-  let chunk = mediaRecorder.requestData()
+  timeKeeperStop()
+  // let chunk = mediaRecorder.requestData()    // This creates a partial chunk on pause
   return
 }
 
 const handleRecordingResume = (e) => {
+  timeKeeperResume()
   return
 }
 
 const handleRecordingStopped = (e) => {
+  timeKeeperStop()
   convertToBuffer(chunks, 0, -1)
   // setTimeout(convertToBuffer(chunks, 0),2000s)
   return

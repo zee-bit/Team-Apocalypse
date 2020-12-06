@@ -16,7 +16,7 @@
 
 <body>
   <nav class="navbar navbar-dark bg-dark fixed-top">
-    <a class="navbar-brand" href="#">TextronAI</a>
+    <span class="navbar-brand" href="#">TextronAI</span>
     <span class="navbar-text">Screen Recorder</span>
     <div style="float: right;">
       <a class="btn btn-dark" id="back-button" href="../index.html">Back</a>
@@ -37,29 +37,34 @@
     <div class="row">
       <div class="col-lg-8 col-xl-8">
         <div class="lecture-container">
-          <div class="row">
+          <div class="">
             <button class="btn btn-warning" id='getSourcesBtn'>Get Video Sources 📸</button>
+            <div id="timeKeeper" class="float-right btn btn-info">
+              <span id="hours">00</span>:<span id="minutes">00</span>:<span id="seconds">00.0</span>
+            </div>
           </div>
           <div class="row justify-content-center py-2">
             <video class='video-container' src="" width="95%" muted="true"></video>
           </div>
           <div class="row pt-1 justify-content-center">
-            <button class="btn btn-primary" id='startBtn' disabled="true">Start ⏺</button>
-            <div class="px-3"><button class="btn btn-info" id='pauseBtn' disabled="true">Pause ⏸</button></div>
-            <button class="btn btn-danger" id='stopBtn' disabled="true">Stop ⏹</button>
-            <div class="px-3"><button class="btn btn-info" id='saveBtn' disabled="true">Save Recording 💾</button></div>
-            <button class="btn btn-danger" id="newRecordingBtn" disabled="true">Start New Recording 🗑</button>
+            <button class="btn btn-primary mt-2 mb-2" id='startBtn' disabled="true">Start ⏺</button>
+            <div class="px-3"><button class="btn btn-info mt-2 mb-2" id='pauseBtn' disabled="true">Pause ⏸</button></div>
+            <button class="btn btn-danger mt-2 mb-2" id='stopBtn' disabled="true">Stop ⏹</button>
+            <div class="px-3"><button class="btn btn-info mt-2 mb-2" id='saveBtn' disabled="true">Save Recording 💾</button></div>
+            <button class="btn btn-danger mt-2 mb-2" id="newRecordingBtn" disabled="true">Start New Recording 🗑</button>
           </div>
         </div>
-        <div id="transcribedTextElement"></div>
-        <div id="finalTranscribedTextElement"></div>
+        <h4>Live Transcription</h4>
+        <div class="container" id="transcribedTextElement"></div>
+        <h4>Final Transcription</h4>
+        <div class="container" id="finalTranscribedTextElement"></div>
       </div>
       <div class="col-lg-4 col-xl-4">
         <div class="editor-container" id="editor-container"></div>
         <div class="row justify-content-center pt-2">
-            <button id="btn-save" class="btn btn-success" onclick="saveRichText()">Save Text</button>
-            <div class="px-2"></div>
-            <button id="btn-load" class="btn btn-info" onclick="loadRichText()">Load Text</button>
+          <button id="btn-save" class="btn btn-success" onclick="saveRichText()">Save Text</button>
+          <div class="px-2"></div>
+          <button id="btn-load" class="btn btn-info" onclick="loadRichText()">Load Text</button>
         </div>
       </div>
     </div>
