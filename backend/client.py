@@ -8,8 +8,9 @@ URL1 = "http://127.0.0.1:5000/transcribe"
 URL2 = "http://127.0.0.1:5000/cont_transcribe"
 
 URL3="http://127.0.0.1:5000/subtits"
-FILE_PATH = "test/final_test.wav"
 import sys
+
+FILE_PATH = sys.argv[2] or "test/rec.wav"
 
 
 
@@ -51,5 +52,6 @@ if __name__ == "__main__":
 		response = requests.post(URL1, data=FILE_PATH)
 		data = response.json()
 		final=data['transcribed_text']
-		print("Transcribed sentence :\n {}".format(final))
+		# print("Transcribed sentence :\n {}".format(final))
+		print("{}".format(final))
 

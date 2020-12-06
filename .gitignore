@@ -92,3 +92,8 @@ venv/
 out/
 
 __pycache__/
+
+# Recorded and Saved Chunks
+*.mp4
+*.webm
+*.wav
