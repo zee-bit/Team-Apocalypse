@@ -14,6 +14,7 @@ def transcribe():
 	audio_file_path=request.data
 
 	ts=TRANSCRIBING_SERVICE()
+	ts.batch_size=16384
 	transcribed_text=ts.transcribe(audio_file_path.decode('ascii'))
 
 	result={"transcribed_text": transcribed_text}
