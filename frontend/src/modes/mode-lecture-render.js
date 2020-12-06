@@ -2,6 +2,9 @@ const { ipcRenderer } = require('electron') // For IPC
 const { DISPLAY_SOURCES, SAVE_PATH } = require('../actions/ipcChannels') // Main Procsses name constants (path relative to the html file)
 const { writeFile } = require('fs') // Save video to disk
 
+// Resize window
+ipcRenderer.send('sudo-enlarge')
+
 // DOM Elements
 
 const getSourcesBtn = document.getElementById("getSourcesBtn")
@@ -9,6 +12,7 @@ const startBtn = document.getElementById("startBtn")
 const pauseBtn = document.getElementById("pauseBtn")
 const stopBtn = document.getElementById("stopBtn")
 const videoElement = document.getElementsByTagName("video")[0]
+const backButton = document.getElementById("back-button")
 
 // Global Variables
 
@@ -66,6 +70,10 @@ pauseBtn.onclick = e => {
 stopBtn.onclick = e => {
   mediaRecorder.stop()
   guiUpdateOnStop()
+}
+
+backButton.onclick = e => {
+  ipcRenderer.send('sudo-shrink')
 }
 
 getSourcesBtn.onclick = async (event) => await ipcRenderer.invoke(DISPLAY_SOURCES)

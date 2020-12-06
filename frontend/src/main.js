@@ -24,6 +24,14 @@ const createWindow = () => {
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools();
+
+  ipcMain.on('sudo-enlarge', (event, arg) => {
+    mainWindow.setSize(2000, 1500)
+  })
+
+  ipcMain.on('sudo-shrink', (event, arg) => {
+    mainWindow.setSize(1000, 650)
+  })
 };
 
 // This method will be called when Electron has finished
