@@ -28,10 +28,11 @@ const createWindow = () => {
   // mainWindow.webContents.openDevTools();
 
   ipcMain.on('sudo-enlarge', (event, arg) => {
-    mainWindow.setSize(2000, 1500)
+    mainWindow.setFullScreen(true)
   })
 
   ipcMain.on('sudo-shrink', (event, arg) => {
+    mainWindow.setFullScreen(false)
     mainWindow.setSize(1000, 650)
   })
 
