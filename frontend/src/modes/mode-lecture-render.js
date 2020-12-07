@@ -40,7 +40,7 @@ let finalFilePaths = []
 
 
 
-// ----------------------Stopwatch Variables----------------------
+// ----------------------TimeKeeper Functions----------------------
 
 let refreshInterval = 150
 let baseTime = 0

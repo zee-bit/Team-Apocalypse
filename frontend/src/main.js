@@ -1,8 +1,9 @@
 const path = require('path')
 const { app, BrowserWindow, ipcMain, screen } = require('electron')
 const { DISPLAY_SOURCES, SAVE_PATH, SUDO_DOCKED, SUDO_ENLARGE, SUDO_SHRINK } = require('./actions/ipcChannels')
-const { handleSavePath, exitDialog } = require('./actions/dialogs')
+const { handleSavePath } = require('./actions/dialogs')
 const { handleDisplaySources } = require('./actions/displaySources')
+const { createTempFolder } = require("./actions/utilityFunctions")
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
@@ -16,7 +17,7 @@ const createWindow = () => {
   mainWindow = new BrowserWindow({
     width: 1000,
     height: 650,
-    autoHideMenuBar: true,
+    autoHideMenuBar: false,
     frame: false,
     webPreferences: {
       nodeIntegration: true,
@@ -58,6 +59,8 @@ app.on('activate', () => {
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+app.on('ready', () => createTempFolder())
 
 ipcMain.handle(DISPLAY_SOURCES, handleDisplaySources)
 ipcMain.handle(SAVE_PATH, handleSavePath)
