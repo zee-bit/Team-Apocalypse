@@ -1,6 +1,8 @@
 const { ipcRenderer } = require('electron') // For IPC
 const path = require('path') // For joining paths
 const { DISPLAY_SOURCES, SAVE_PATH, SUDO_ENLARGE, SUDO_SHRINK } = require('../actions/ipcChannels') // Main Procsses name constants (path relative to the html file)
+const { DEVELOPER_MODE, FINAL_TRANSCRIBED_TEXT_SHOW } = require('../actions/flags')
+const { deleteFiles } = require('../actions/utilityFunctions')
 const { writeFile } = require('fs') // Save video to disk
 const { PythonShell } = require("python-shell") // Run python scripts
 
@@ -18,7 +20,7 @@ const newRecordingBtn = document.getElementById("newRecordingBtn")
 const videoElement = document.getElementsByTagName("video")[0]
 const backButton = document.getElementById("back-button")
 const transcribedTextElement = document.getElementById("transcribedTextElement")
-const finalTranscribedTextElement = document.getElementById("finalTranscribedTextElement")
+const timeKeeperElement = document.getElementById("timeKeeper")
 const hoursElement = document.getElementById("hours")
 const minutesElement = document.getElementById("minutes")
 const secondsElement = document.getElementById("seconds")
@@ -61,20 +63,16 @@ timeKeeperGetTimeElapsed = () => {
   ]
 }
 
-timeKeeperUpdateElements = (data = timeKeeperGetTimeElapsed()) => {
-  hoursElement.innerText = data[0]
-  minutesElement.innerText = data[1]
-  secondsElement.innerText = data[2]
-}
-
 timeKeeperResume = () => {
   baseTime = Date.now()
   timeKeeper = setInterval(timeKeeperUpdateElements, refreshInterval)
+  timeKeeperElement.classList.add("blinking")
 }
 
 timeKeeperStop = () => {
   timeElapsedTillPause += Date.now() - baseTime
   clearInterval(timeKeeper)
+  timeKeeperElement.classList.remove("blinking")
 }
 
 timeKeeperStart = (interval = refreshInterval) => {
@@ -82,6 +80,7 @@ timeKeeperStart = (interval = refreshInterval) => {
   baseTime = Date.now()
   timeElapsedTillPause = 0
   timeKeeper = setInterval(timeKeeperUpdateElements, refreshInterval)
+  timeKeeperElement.classList.add("blinking")
 }
 
 
@@ -90,6 +89,14 @@ timeKeeperStart = (interval = refreshInterval) => {
 
 
 // ------------------------GUI Updating Methods------------------------
+
+
+
+timeKeeperUpdateElements = (data = timeKeeperGetTimeElapsed()) => {
+  hoursElement.innerText = data[0]
+  minutesElement.innerText = data[1]
+  secondsElement.innerText = data[2]
+}
 
 guiUpdateOnStop = () => {
   startBtn.innerText = "Start"
@@ -137,7 +144,6 @@ guiUpdateOnNew = () => {
   saveBtn.setAttribute("disabled", "true")
   newRecordingBtn.setAttribute("disabled", "true")
   transcribedTextElement.innerHTML = ""
-  finalTranscribedTextElement.innerHTML = ""
   timeKeeperReset()
 }
 
@@ -183,13 +189,14 @@ getSourcesBtn.onclick = (event) => ipcRenderer.invoke(DISPLAY_SOURCES)
 
 handleNewRecording = (event) => {
   if (finalFilePaths != [])
-    deleteChunkFiles(finalFilePaths)
+    deleteFiles(finalFilePaths)
   finalFilePaths = []
   chunks = []
   sliceIndex = -1
   totalDuration = 0
   finalTranscribedText = {}
   guiUpdateOnNew()
+
 }
 newRecordingBtn.onclick = handleNewRecording
 
@@ -201,12 +208,14 @@ newRecordingBtn.onclick = handleNewRecording
 // ----------------Handle Returns from Scripts----------------
 
 const handleDisplayTranscribed = (transcribedText, chunkIndex) => {
-  console.log(chunkIndex, transcribedText)
-  if (chunkIndex != -1)
+  if (newRecordingBtn.attributes.disabled)
+    retun
+  if (DEVELOPER_MODE)
+    console.log(chunkIndex, transcribedText)
+  if ((DEVELOPER_MODE && !FINAL_TRANSCRIBED_TEXT_SHOW) && chunkIndex != -1)
     transcribedTextElement.innerHTML = transcribedTextElement.innerHTML + " " + transcribedText
   else {
-    finalTranscribedTextElement.innerHTML = transcribedText
-    console.log(finalTranscribedText)
+    transcribedTextElement.innerHTML = (chunkIndex == -1 ? "" : transcribedTextElement.innerHTML + " ") + transcribedText
   }
   finalTranscribedText[chunkIndex] = transcribedText
 }
@@ -241,18 +250,18 @@ const saveAsMp4 = (inputFileName, outputFileName) => {
 }
 
 // Delete the Temporary Chunk Files
-deleteChunkFiles = async (list) => {
+// deleteChunkFiles = async (list) => {
 
-  let options = {
-    scriptPath: scriptDirectory,
-    args: list
-  }
+//   let options = {
+//     scriptPath: scriptDirectory,
+//     args: list
+//   }
 
-  let delete_Files = new PythonShell('delete_files.py', options)
-  delete_Files.on('message', (success) => {
-    return
-  })
-}
+//   let delete_Files = new PythonShell('delete_files.py', options)
+//   delete_Files.on('message', (success) => {
+//     return
+//   })
+// }
 
 // Get the wav file Length
 getLastWavDuration = (wavFilePath, chunkIndex) => {
@@ -280,7 +289,8 @@ callClient = (query, webmFilePath, wavFilePath, wavFileName, chunkIndex) => {
   call_Client.on('message', (transcribedText) => {
     handleDisplayTranscribed(transcribedText, chunkIndex)
     if (chunkIndex != -1)
-      deleteChunkFiles([webmFilePath, wavFilePath])
+      // deleteChunkFiles([webmFilePath, wavFilePath])
+      deleteFiles([webmFilePath, wavFilePath])
   })
 }
 
