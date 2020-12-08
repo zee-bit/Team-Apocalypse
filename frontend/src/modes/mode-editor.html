@@ -1,32 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.quilljs.com/1.3.6/quill.snow.css">
-    <link rel="stylesheet" href="mode-editor.css">
-    <title>Editor Mode</title>
-</head>
-<body>
-    <nav class="navbar navbar-dark bg-dark fixed-top">
-        <a class="navbar-brand" href="#">TextronAI</a>
-        <span class="navbar-text">Notes Editor</span>
-        <div class="back-button">
-            <a class="btn btn-dark" href="../index.html">Back</a>
-        </div>
-    </nav>
-    <div class="container">
-        <div class="editor-container" id="editor-container"></div>
-        <div class="row justify-content-center pt-2">
-            <button id="btn-save" class="btn btn-success" onclick="saveRichText()">Save Text</button>
-            <div class="px-2"></div>
-            <button id="btn-load" class="btn btn-info" onclick="loadRichText()">Load Text</button>
-        </div>
-    </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
-    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
-    <script src="mode-editor.js"></script>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../lib/bootstrap4.5.2.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+  <link rel="stylesheet" href="../lib/quill.snow.1.3.6.css">
+  <link rel="stylesheet" href="mode-editor.css">
+  <script defer src="../lib/jquery.2.2.2.min.js"></script>
+  <script defer src="../lib/quill.1.3.6.js"></script>
+  <script defer src="mode-editor.js"></script>
+  <title>Editor Mode</title>
+</head>
+
+<body>
+  <nav class="navbar navbar-dark bg-dark fixed-top">
+    <a class="navbar-brand" href="#">TextronAI</a>
+    <span class="navbar-text">Notes Editor</span>
+    <div class="back-button">
+      <a class="btn btn-dark" href="../index.html">Back</a>
+    </div>
+  </nav>
+  <div class="container">
+    <div class="editor-container" id="editor-container"></div>
+    <div class="row justify-content-center pt-2">
+      <button id="btn-save" class="btn btn-success" onclick="saveRichText()">Save Text</button>
+      <div class="px-2"></div>
+      <button id="btn-load" class="btn btn-info" onclick="loadRichText()">Load Text</button>
+    </div>
+  </div>
 </body>
+
 </html>

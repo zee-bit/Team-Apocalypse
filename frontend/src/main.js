@@ -17,8 +17,8 @@ const createWindow = () => {
   mainWindow = new BrowserWindow({
     width: 1000,
     height: 650,
-    autoHideMenuBar: false,
-    frame: false,
+    autoHideMenuBar: true,
+    frame: true,
     webPreferences: {
       nodeIntegration: true,
     }
@@ -60,6 +60,10 @@ app.on('activate', () => {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// app.on('before-quit', () => {
+//   console.log("Before Quit")
+//   clearTemp()
+// })
 app.on('ready', () => createTempFolder())
 
 ipcMain.handle(DISPLAY_SOURCES, handleDisplaySources)
@@ -72,7 +76,8 @@ resizeAndCentre = (w, h) => {
 
 ipcMain.handle(SUDO_ENLARGE, (event, arg) => {
   let { width, height } = screen.getPrimaryDisplay().workAreaSize
-  mainWindow.setBounds({ x: 50, y: 50, width: width - 100, height: height - 100 })
+  // mainWindow.setBounds({ x: 50, y: 50, width: width - 100, height: height - 100 })
+  mainWindow.setBounds({ x: 0, y: 0, width: Math.floor(width / 2), height: height - 300 })
 })
 
 ipcMain.handle(SUDO_SHRINK, (event, arg) => resizeAndCentre(1000, 650))
