@@ -18,7 +18,7 @@ const stopBtn = document.getElementById("stopBtn")
 const saveBtn = document.getElementById("saveBtn")
 const newRecordingBtn = document.getElementById("newRecordingBtn")
 const videoElement = document.getElementsByTagName("video")[0]
-const backButton = document.getElementById("back-button")
+const backButton = document.getElementById("btn-back")
 const transcribedTextElement = document.getElementById("transcribedTextElement")
 const timeKeeperElement = document.getElementById("timeKeeper")
 const hoursElement = document.getElementById("hours")
@@ -178,9 +178,9 @@ startBtn.onclick = e => {
   guiUpdateOnStart()
 }
 
-// backButton.onclick = e => {
-//   ipcRenderer.invoke(SUDO_SHRINK)
-// }
+backButton.onclick = e => {
+  ipcRenderer.invoke(SUDO_SHRINK)
+}
 
 getSourcesBtn.onclick = (event) => ipcRenderer.invoke(DISPLAY_SOURCES)
 
