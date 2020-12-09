@@ -44,14 +44,14 @@ let finalFilePaths = []
 
 // ----------------------TimeKeeper Functions----------------------
 
-let refreshInterval = 150
+let refreshInterval = 50
 let baseTime = 0
 let timeElapsedTillPause = 0
 
 timeKeeperReset = () => {
   baseTime = 0
   timeElapsedTillPause = 0
-  timeKeeperUpdateElements(["00", "00", "00.0"])
+  timeKeeperUpdateElements(["00", "00", "00.00"])
 }
 
 timeKeeperGetTimeElapsed = () => {
@@ -59,7 +59,7 @@ timeKeeperGetTimeElapsed = () => {
   return [
     Math.floor(elapsedTime / (1000 * 60 * 60)),
     Math.floor((elapsedTime % (1000 * 60 * 60)) / (1000 * 60)),
-    ((elapsedTime % (1000 * 60)) / 1000).toFixed(1)
+    ((elapsedTime % (1000 * 60)) / 1000).toFixed(2)
   ]
 }
 
@@ -90,12 +90,10 @@ timeKeeperStart = (interval = refreshInterval) => {
 
 // ------------------------GUI Updating Methods------------------------
 
-
-
 timeKeeperUpdateElements = (data = timeKeeperGetTimeElapsed()) => {
-  hoursElement.innerText = data[0]
-  minutesElement.innerText = data[1]
-  secondsElement.innerText = data[2]
+  hoursElement.innerText = (data[0].toString().length == 1 ? "0" : "") + data[0].toString()
+  minutesElement.innerText = (data[1].toString().length == 1 ? "0" : "") + data[1].toString()
+  secondsElement.innerText = (data[2].length == 4 ? "0" : "") + data[2]
 }
 
 guiUpdateOnStop = () => {
@@ -180,9 +178,9 @@ startBtn.onclick = e => {
   guiUpdateOnStart()
 }
 
-backButton.onclick = e => {
-  ipcRenderer.invoke(SUDO_SHRINK)
-}
+// backButton.onclick = e => {
+//   ipcRenderer.invoke(SUDO_SHRINK)
+// }
 
 getSourcesBtn.onclick = (event) => ipcRenderer.invoke(DISPLAY_SOURCES)
 
