@@ -1,6 +1,6 @@
 const { ipcRenderer } = require('electron') // For IPC
 const path = require('path') // For joining paths
-const { DISPLAY_SOURCES, SAVE_PATH, SUDO_ENLARGE, SUDO_SHRINK } = require('../actions/ipcChannels') // Main Procsses name constants (path relative to the html file)
+const { DISPLAY_SOURCES, SAVE_PATH, SUDO_ENLARGE} = require('../actions/ipcChannels') // Main Procsses name constants (path relative to the html file)
 const { DEVELOPER_MODE, FINAL_TRANSCRIBED_TEXT_SHOW } = require('../actions/flags')
 const { deleteFiles } = require('../actions/utilityFunctions')
 const { writeFile } = require('fs') // Save video to disk
@@ -18,7 +18,6 @@ const stopBtn = document.getElementById("stopBtn")
 const saveBtn = document.getElementById("saveBtn")
 const newRecordingBtn = document.getElementById("newRecordingBtn")
 const videoElement = document.getElementsByTagName("video")[0]
-const backButton = document.getElementById("btn-back")
 const transcribedTextElement = document.getElementById("transcribedTextElement")
 const timeKeeperElement = document.getElementById("timeKeeper")
 const hoursElement = document.getElementById("hours")
@@ -176,10 +175,6 @@ startBtn.onclick = e => {
   else
     mediaRecorder.start()
   guiUpdateOnStart()
-}
-
-backButton.onclick = e => {
-  ipcRenderer.invoke(SUDO_SHRINK)
 }
 
 getSourcesBtn.onclick = (event) => ipcRenderer.invoke(DISPLAY_SOURCES)
