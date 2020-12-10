@@ -1,11 +1,13 @@
 const { ipcRenderer } = require('electron') // For IPC
 const path = require('path') // For joining paths
-const { DISPLAY_SOURCES, SAVE_PATH } = require('../actions/ipcChannels') // Main Procsses name constants (path relative to the html file)
+const { DISPLAY_SOURCES, SAVE_PATH, SUDO_ENLARGE} = require('../actions/ipcChannels') // Main Procsses name constants (path relative to the html file)
+const { DEVELOPER_MODE, FINAL_TRANSCRIBED_TEXT_SHOW } = require('../actions/flags')
+const { deleteFiles } = require('../actions/utilityFunctions')
 const { writeFile } = require('fs') // Save video to disk
 const { PythonShell } = require("python-shell") // Run python scripts
 
 // Resize window
-ipcRenderer.send('sudo-enlarge')
+ipcRenderer.invoke(SUDO_ENLARGE)
 
 // DOM Elements
 
@@ -16,9 +18,11 @@ const stopBtn = document.getElementById("stopBtn")
 const saveBtn = document.getElementById("saveBtn")
 const newRecordingBtn = document.getElementById("newRecordingBtn")
 const videoElement = document.getElementsByTagName("video")[0]
-const backButton = document.getElementById("back-button")
 const transcribedTextElement = document.getElementById("transcribedTextElement")
-const finalTranscribedTextElement = document.getElementById("finalTranscribedTextElement")
+const timeKeeperElement = document.getElementById("timeKeeper")
+const hoursElement = document.getElementById("hours")
+const minutesElement = document.getElementById("minutes")
+const secondsElement = document.getElementById("seconds")
 
 // Global Variables
 
@@ -29,7 +33,6 @@ let tempDirectory = path.join(__dirname, "../../../backend/temp/")
 let scriptDirectory = path.join(__dirname, "../../../backend/scripts/")
 let sliceIndex = -1
 let totalDuration = 0
-let wavDurations = {}
 let finalTranscribedText = {}
 let finalFilePaths = []
 
@@ -37,7 +40,60 @@ let finalFilePaths = []
 
 
 
+
+// ----------------------TimeKeeper Functions----------------------
+
+let refreshInterval = 50
+let baseTime = 0
+let timeElapsedTillPause = 0
+
+timeKeeperReset = () => {
+  baseTime = 0
+  timeElapsedTillPause = 0
+  timeKeeperUpdateElements(["00", "00", "00.00"])
+}
+
+timeKeeperGetTimeElapsed = () => {
+  let elapsedTime = Date.now() - baseTime + timeElapsedTillPause
+  return [
+    Math.floor(elapsedTime / (1000 * 60 * 60)),
+    Math.floor((elapsedTime % (1000 * 60 * 60)) / (1000 * 60)),
+    ((elapsedTime % (1000 * 60)) / 1000).toFixed(2)
+  ]
+}
+
+timeKeeperResume = () => {
+  baseTime = Date.now()
+  timeKeeper = setInterval(timeKeeperUpdateElements, refreshInterval)
+  timeKeeperElement.classList.add("blinking")
+}
+
+timeKeeperStop = () => {
+  timeElapsedTillPause += Date.now() - baseTime
+  clearInterval(timeKeeper)
+  timeKeeperElement.classList.remove("blinking")
+}
+
+timeKeeperStart = (interval = refreshInterval) => {
+  refreshInterval = interval
+  baseTime = Date.now()
+  timeElapsedTillPause = 0
+  timeKeeper = setInterval(timeKeeperUpdateElements, refreshInterval)
+  timeKeeperElement.classList.add("blinking")
+}
+
+
+
+
+
+
 // ------------------------GUI Updating Methods------------------------
+
+timeKeeperUpdateElements = (data = timeKeeperGetTimeElapsed()) => {
+  hoursElement.innerText = (data[0].toString().length == 1 ? "0" : "") + data[0].toString()
+  minutesElement.innerText = (data[1].toString().length == 1 ? "0" : "") + data[1].toString()
+  secondsElement.innerText = (data[2].length == 4 ? "0" : "") + data[2]
+}
 
 guiUpdateOnStop = () => {
   startBtn.innerText = "Start"
@@ -77,9 +133,7 @@ guiUpdateOnSourceUnavailable = error => {
 }
 
 guiUpdateOnNew = () => {
-  // videoElement.srcObject = null
   getSourcesBtn.removeAttribute("disabled")
-  // getSourcesBtn.innerText = "Select Video Source 📸"
   if (mediaRecorder != undefined)
     startBtn.removeAttribute("disabled")
   pauseBtn.setAttribute("disabled", "true")
@@ -87,7 +141,7 @@ guiUpdateOnNew = () => {
   saveBtn.setAttribute("disabled", "true")
   newRecordingBtn.setAttribute("disabled", "true")
   transcribedTextElement.innerHTML = ""
-  finalTranscribedTextElement.innerHTML = ""
+  timeKeeperReset()
 }
 
 
@@ -116,12 +170,11 @@ pauseBtn.onclick = e => {
 }
 
 startBtn.onclick = e => {
-  mediaRecorder.start(timeslice)
+  if (timeslice)
+    mediaRecorder.start(timeslice)
+  else
+    mediaRecorder.start()
   guiUpdateOnStart()
-}
-
-backButton.onclick = e => {
-  ipcRenderer.send('sudo-shrink')
 }
 
 getSourcesBtn.onclick = (event) => ipcRenderer.invoke(DISPLAY_SOURCES)
@@ -129,14 +182,14 @@ getSourcesBtn.onclick = (event) => ipcRenderer.invoke(DISPLAY_SOURCES)
 
 handleNewRecording = (event) => {
   if (finalFilePaths != [])
-    deleteChunkFiles(finalFilePaths)
+    deleteFiles(finalFilePaths)
   finalFilePaths = []
   chunks = []
   sliceIndex = -1
   totalDuration = 0
-  wavDurations = {}
   finalTranscribedText = {}
   guiUpdateOnNew()
+
 }
 newRecordingBtn.onclick = handleNewRecording
 
@@ -148,18 +201,19 @@ newRecordingBtn.onclick = handleNewRecording
 // ----------------Handle Returns from Scripts----------------
 
 const handleDisplayTranscribed = (transcribedText, chunkIndex) => {
-  console.log(chunkIndex, transcribedText)
-  if (chunkIndex != -1)
+  if (newRecordingBtn.attributes.disabled)
+    retun
+  if (DEVELOPER_MODE)
+    console.log(chunkIndex, transcribedText)
+  if ((DEVELOPER_MODE && !FINAL_TRANSCRIBED_TEXT_SHOW) && chunkIndex != -1)
     transcribedTextElement.innerHTML = transcribedTextElement.innerHTML + " " + transcribedText
   else {
-    finalTranscribedTextElement.innerHTML = transcribedText
-    console.log(finalTranscribedText)
+    transcribedTextElement.innerHTML = (chunkIndex == -1 ? "" : transcribedTextElement.innerHTML + " ") + transcribedText
   }
   finalTranscribedText[chunkIndex] = transcribedText
 }
 
 handleLastWavDuration = (duration, chunkIndex) => {
-  wavDurations[chunkIndex] = parseFloat(duration)
   totalDuration += parseFloat(duration)
   return
 }
@@ -189,18 +243,18 @@ const saveAsMp4 = (inputFileName, outputFileName) => {
 }
 
 // Delete the Temporary Chunk Files
-deleteChunkFiles = async (list) => {
+// deleteChunkFiles = async (list) => {
 
-  let options = {
-    scriptPath: scriptDirectory,
-    args: list
-  }
+//   let options = {
+//     scriptPath: scriptDirectory,
+//     args: list
+//   }
 
-  let delete_Files = new PythonShell('delete_files.py', options)
-  delete_Files.on('message', (success) => {
-    return
-  })
-}
+//   let delete_Files = new PythonShell('delete_files.py', options)
+//   delete_Files.on('message', (success) => {
+//     return
+//   })
+// }
 
 // Get the wav file Length
 getLastWavDuration = (wavFilePath, chunkIndex) => {
@@ -228,7 +282,8 @@ callClient = (query, webmFilePath, wavFilePath, wavFileName, chunkIndex) => {
   call_Client.on('message', (transcribedText) => {
     handleDisplayTranscribed(transcribedText, chunkIndex)
     if (chunkIndex != -1)
-      deleteChunkFiles([webmFilePath, wavFilePath])
+      // deleteChunkFiles([webmFilePath, wavFilePath])
+      deleteFiles([webmFilePath, wavFilePath])
   })
 }
 
@@ -313,40 +368,33 @@ const convertToBuffer = async (chunks, startTime, chunkIndex) => {
 
 
 
-// Get startTime
-
-const getStartTime = (chunkIndex) => {
-  return totalDuration.toFixed(3)
-}
-
-
-
-
-
-
 // Media Recorder Event Handlers
 
 const handleRecordingStart = (e) => {
+  timeKeeperStart()
   return
 }
 
 const handleDataAvailable = (e) => {
   sliceIndex++
   chunks.push(e.data)
-  convertToBuffer(chunks, getStartTime(sliceIndex), sliceIndex)
+  convertToBuffer(chunks, totalDuration.toFixed(3), sliceIndex)
   return
 }
 
 const handleRecordingPause = (e) => {
-  let chunk = mediaRecorder.requestData()
+  timeKeeperStop()
+  // let chunk = mediaRecorder.requestData()    // This creates a partial chunk on pause
   return
 }
 
 const handleRecordingResume = (e) => {
+  timeKeeperResume()
   return
 }
 
 const handleRecordingStopped = (e) => {
+  timeKeeperStop()
   convertToBuffer(chunks, 0, -1)
   // setTimeout(convertToBuffer(chunks, 0),2000s)
   return

@@ -1,11 +1,11 @@
 const { ipcRenderer } = require('electron') // For IPC
 const path = require('path') // For joining paths
-const { DISPLAY_SOURCES, SAVE_PATH } = require('../actions/ipcChannels') // Main Procsses name constants (path relative to the html file)
+const { DISPLAY_SOURCES, SAVE_PATH, SUDO_DOCKED } = require('../actions/ipcChannels') // Main Procsses name constants (path relative to the html file)
 const { writeFile } = require('fs') // Save video to disk
 const { PythonShell } = require("python-shell") // Run python scripts
 
 // Resize window
-ipcRenderer.send('sudo-docked')
+ipcRenderer.invoke(SUDO_DOCKED)
 
 // DOM Elements
 
@@ -106,10 +106,6 @@ pauseBtn.onclick = e => {
 startBtn.onclick = e => {
   mediaRecorder.start(timeslice)
   guiUpdateOnStart()
-}
-
-backButton.onclick = e => {
-  ipcRenderer.send('sudo-shrink')
 }
 
 getSourcesBtn.onclick = (event) => ipcRenderer.invoke(DISPLAY_SOURCES)

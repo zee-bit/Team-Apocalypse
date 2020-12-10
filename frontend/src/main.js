@@ -1,41 +1,34 @@
-const { app, BrowserWindow, ipcMain } = require('electron')
 const path = require('path')
-const { DISPLAY_SOURCES, SAVE_PATH } = require('./actions/ipcChannels')
-const { handleSavePath, exitDialog } = require('./actions/dialogs')
+const { app, BrowserWindow, ipcMain, screen } = require('electron')
+const { WINDOW_MINIMIZE, WINDOW_MAXIMIZE, WINDOW_CLOSE, DISPLAY_SOURCES, SAVE_PATH, SUDO_DOCKED, SUDO_ENLARGE, SUDO_SHRINK } = require('./actions/ipcChannels')
+const { handleSavePath } = require('./actions/dialogs')
 const { handleDisplaySources } = require('./actions/displaySources')
+const { createTempFolder } = require("./actions/utilityFunctions")
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
   app.quit();
 }
 
+let mainWindow
+
 const createWindow = () => {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 1000,
     height: 650,
+    autoHideMenuBar: true,
+    frame: false,
     webPreferences: {
       nodeIntegration: true,
     }
   });
 
   // and load the index.html of the app.
-  mainWindow.loadFile(path.join(__dirname, 'index.html'));
+  mainWindow.loadFile(path.join(__dirname, 'modes/index.html'));
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools();
-
-  ipcMain.on('sudo-enlarge', (event, arg) => {
-    mainWindow.setSize(2000, 1500)
-  })
-
-  ipcMain.on('sudo-shrink', (event, arg) => {
-    mainWindow.setSize(1000, 650)
-  })
-
-  ipcMain.on('sudo-docked', (event, arg) => {
-    mainWindow.setSize(630, 500)
-  })
 };
 
 // This method will be called when Electron has finished
@@ -67,9 +60,38 @@ app.on('activate', () => {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// Create temp folder if folder unavailable
+app.on('ready', () => createTempFolder())
+
+ipcMain.handle(WINDOW_MINIMIZE, handleWindowMinimize = (e) => {
+  mainWindow.minimize()
+})
+ipcMain.handle(WINDOW_MAXIMIZE, handleWindowMaximize = (e) => {
+  if (mainWindow.isMaximized())
+    mainWindow.unmaximize()
+  else
+    mainWindow.maximize()
+})
+ipcMain.handle(WINDOW_CLOSE, handleWindowClose = (e) => {
+  mainWindow.close()
+})
 
 ipcMain.handle(DISPLAY_SOURCES, handleDisplaySources)
 ipcMain.handle(SAVE_PATH, handleSavePath)
+
+resizeAndCentre = (w, h) => {
+  let { width, height } = screen.getPrimaryDisplay().workAreaSize
+  mainWindow.setBounds({ x: Math.floor((width - w) / 2), y: Math.floor((height - h) / 2), width: w, height: h })
+}
+
+ipcMain.handle(SUDO_ENLARGE, (event, arg) => {
+  let { width, height } = screen.getPrimaryDisplay().workAreaSize
+  mainWindow.setBounds({ x: 50, y: 50, width: width - 100, height: height - 100 })
+})
+
+ipcMain.handle(SUDO_SHRINK, (event, arg) => resizeAndCentre(1000, 650))
+
+ipcMain.handle(SUDO_DOCKED, (event, arg) => resizeAndCentre(630, 200))
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
