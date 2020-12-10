@@ -1,10 +1,10 @@
-const { ipcRenderer } = require('electron') // For IPC
 const path = require('path') // For joining paths
-const { DISPLAY_SOURCES, SAVE_PATH, SUDO_ENLARGE} = require('../actions/ipcChannels') // Main Procsses name constants (path relative to the html file)
-const { DEVELOPER_MODE, FINAL_TRANSCRIBED_TEXT_SHOW } = require('../actions/flags')
-const { deleteFiles } = require('../actions/utilityFunctions')
 const { writeFile } = require('fs') // Save video to disk
 const { PythonShell } = require("python-shell") // Run python scripts
+const { ipcRenderer } = require('electron') // For IPC
+const { DISPLAY_SOURCES, SAVE_PATH, SUDO_ENLARGE } = require(path.join(__dirname, "..", "actions", "ipcChannels")) // Main Procsses name constants (path relative to the html file)
+const { DEVELOPER_MODE, FINAL_TRANSCRIBED_TEXT_SHOW } = require(path.join(__dirname, "..", "actions", "flags"))
+const { deleteFiles } = require(path.join(__dirname, "..", "actions", "utilityFunctions"))
 
 // Resize window
 ipcRenderer.invoke(SUDO_ENLARGE)
@@ -29,8 +29,8 @@ const secondsElement = document.getElementById("seconds")
 let mediaRecorder
 let chunks = []
 let timeslice = 5000
-let tempDirectory = path.join(__dirname, "../../../backend/temp/")
-let scriptDirectory = path.join(__dirname, "../../../backend/scripts/")
+let tempDirectory = path.join(__dirname, "..", "..", "..", "backend", "temp")
+let scriptDirectory = path.join(__dirname, "..", "..", "..", "backend", "scripts")
 let sliceIndex = -1
 let totalDuration = 0
 let finalTranscribedText = {}
@@ -274,7 +274,7 @@ getLastWavDuration = (wavFilePath, chunkIndex) => {
 callClient = (query, webmFilePath, wavFilePath, wavFileName, chunkIndex) => {
 
   let options = {
-    scriptPath: path.join(__dirname, "/../../../backend"),
+    scriptPath: path.join(__dirname, "..", "..", "..", "backend"),
     args: [query, wavFilePath]
   }
 
