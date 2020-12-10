@@ -1,6 +1,6 @@
 const path = require('path')
 const { app, BrowserWindow, ipcMain, screen } = require('electron')
-const { WINDOW_MINIMIZE, WINDOW_MAXIMIZE, WINDOW_CLOSE, DISPLAY_SOURCES, SAVE_PATH, SUDO_DOCKED, SUDO_ENLARGE, SUDO_SHRINK } = require('./actions/ipcChannels')
+const { WINDOW_MINIMIZE, WINDOW_MAXIMIZE, WINDOW_CLOSE, DISPLAY_SOURCES, SAVE_PATH, SUDO_DOCKED, SUDO_ENLARGE, SUDO_SHRINK, SUDO_PLAYER } = require('./actions/ipcChannels')
 const { handleSavePath } = require('./actions/dialogs')
 const { handleDisplaySources } = require('./actions/displaySources')
 const { createTempFolder } = require("./actions/utilityFunctions")
@@ -87,6 +87,11 @@ resizeAndCentre = (w, h) => {
 ipcMain.handle(SUDO_ENLARGE, (event, arg) => {
   let { width, height } = screen.getPrimaryDisplay().workAreaSize
   mainWindow.setBounds({ x: 50, y: 50, width: width - 100, height: height - 100 })
+})
+
+ipcMain.handle(SUDO_PLAYER, (event, arg) => {
+  let { width, height } = screen.getPrimaryDisplay().workAreaSize
+  mainWindow.setBounds({ x: 150, y: 150, width: width - 500, height: height - 300 })
 })
 
 ipcMain.handle(SUDO_SHRINK, (event, arg) => resizeAndCentre(1000, 650))

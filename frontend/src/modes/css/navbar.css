@@ -33,10 +33,10 @@
 
   #btn-back {
     display: inline-block;
-    width: 2rem;
-    height: 1.25rem;
+    width: 1.5rem;
+    height: 1.5rem;
     border: 0;
-    border-radius: 1rem;
+    border-radius: 1.5rem;
     box-shadow: 1px 1px 3px 0px rgba(0, 0, 0, 0.7) inset, 0 0 2px 1px rgba(142, 150, 158, 0.25);
   }
 
@@ -50,9 +50,9 @@
 
   .window-option {
     display: inline-block;
-    width: 1.7rem;
-    height: 1rem;
+    width: 1.5rem;
+    height: 1.5rem;
     border: 0;
-    border-radius: 0.75rem;
+    border-radius: 1.5rem;
     box-shadow: 1px 1px 3px 0px rgba(0, 0, 0, 0.7) inset, 0 0 2px 1px rgba(142, 150, 158, 0.25);
   }

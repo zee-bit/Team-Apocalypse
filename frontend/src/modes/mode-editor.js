@@ -30,7 +30,8 @@ function saveRichText() {
 function loadRichText() {
     // Requires system specific utility download for 'unrtf' engine.
     // Python engine does not require any download but it doesnt 
-    // work for me. Download link below.
+    // work for me, but you can try it yourself by passing
+    // default engine as python. Download link below.
     // [https://www.npmjs.com/package/unrtf]
     let unrtf = require('unrtf')
     unrtf.defaultEngine = 'unrtf'
