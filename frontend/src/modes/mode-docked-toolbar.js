@@ -1,6 +1,6 @@
 const { ipcRenderer } = require('electron') // For IPC
 const path = require('path') // For joining paths
-const { DISPLAY_SOURCES, SAVE_PATH, SUDO_DOCKED, SUDO_SHRINK } = require('../actions/ipcChannels') // Main Procsses name constants (path relative to the html file)
+const { DISPLAY_SOURCES, SAVE_PATH, SUDO_DOCKED } = require('../actions/ipcChannels') // Main Procsses name constants (path relative to the html file)
 const { writeFile } = require('fs') // Save video to disk
 const { PythonShell } = require("python-shell") // Run python scripts
 
@@ -106,10 +106,6 @@ pauseBtn.onclick = e => {
 startBtn.onclick = e => {
   mediaRecorder.start(timeslice)
   guiUpdateOnStart()
-}
-
-backButton.onclick = e => {
-  ipcRenderer.invoke(SUDO_SHRINK)
 }
 
 getSourcesBtn.onclick = (event) => ipcRenderer.invoke(DISPLAY_SOURCES)

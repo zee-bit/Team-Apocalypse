@@ -1,6 +1,6 @@
 const path = require('path')
 const { app, BrowserWindow, ipcMain, screen } = require('electron')
-const { DISPLAY_SOURCES, SAVE_PATH, SUDO_DOCKED, SUDO_ENLARGE, SUDO_SHRINK } = require('./actions/ipcChannels')
+const { WINDOW_MINIMIZE, WINDOW_MAXIMIZE, WINDOW_CLOSE, DISPLAY_SOURCES, SAVE_PATH, SUDO_DOCKED, SUDO_ENLARGE, SUDO_SHRINK } = require('./actions/ipcChannels')
 const { handleSavePath } = require('./actions/dialogs')
 const { handleDisplaySources } = require('./actions/displaySources')
 const { createTempFolder } = require("./actions/utilityFunctions")
@@ -18,14 +18,14 @@ const createWindow = () => {
     width: 1000,
     height: 650,
     autoHideMenuBar: true,
-    frame: true,
+    frame: false,
     webPreferences: {
       nodeIntegration: true,
     }
   });
 
   // and load the index.html of the app.
-  mainWindow.loadFile(path.join(__dirname, 'index.html'));
+  mainWindow.loadFile(path.join(__dirname, 'modes/index.html'));
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools();
@@ -60,11 +60,21 @@ app.on('activate', () => {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// app.on('before-quit', () => {
-//   console.log("Before Quit")
-//   clearTemp()
-// })
+// Create temp folder if folder unavailable
 app.on('ready', () => createTempFolder())
+
+ipcMain.handle(WINDOW_MINIMIZE, handleWindowMinimize = (e) => {
+  mainWindow.minimize()
+})
+ipcMain.handle(WINDOW_MAXIMIZE, handleWindowMaximize = (e) => {
+  if (mainWindow.isMaximized())
+    mainWindow.unmaximize()
+  else
+    mainWindow.maximize()
+})
+ipcMain.handle(WINDOW_CLOSE, handleWindowClose = (e) => {
+  mainWindow.close()
+})
 
 ipcMain.handle(DISPLAY_SOURCES, handleDisplaySources)
 ipcMain.handle(SAVE_PATH, handleSavePath)
@@ -76,8 +86,7 @@ resizeAndCentre = (w, h) => {
 
 ipcMain.handle(SUDO_ENLARGE, (event, arg) => {
   let { width, height } = screen.getPrimaryDisplay().workAreaSize
-  // mainWindow.setBounds({ x: 50, y: 50, width: width - 100, height: height - 100 })
-  mainWindow.setBounds({ x: 0, y: 0, width: Math.floor(width / 2), height: height - 300 })
+  mainWindow.setBounds({ x: 50, y: 50, width: width - 100, height: height - 100 })
 })
 
 ipcMain.handle(SUDO_SHRINK, (event, arg) => resizeAndCentre(1000, 650))

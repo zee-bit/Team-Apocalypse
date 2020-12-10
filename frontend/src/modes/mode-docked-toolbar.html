@@ -1,34 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
-    <link rel="stylesheet" href="mode-docked-toolbar.css">
-    <script defer src="mode-docked-toolbar.js"></script>
-    <title>Docked Toolbar Mode</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../lib/bootstrap4.5.2.min.css">
+  <link rel="stylesheet" href="./css/navbar.css">
+  <link rel="stylesheet" href="mode-docked-toolbar.css">
+  <script defer src="js/navbar.js"></script>
+  <script defer src="mode-docked-toolbar.js"></script>
+  <script defer src="../lib/jquery.2.2.2.min.js"></script>
+  <title>Docked Toolbar Mode</title>
 </head>
+
 <body>
-    <nav class="navbar navbar-dark bg-dark fixed-top">
-        <a class="navbar-brand" href="index.html">TextronAI</a>
-        <span class="navbar-text">Docked Mode</span>
-        <div style="float: right;">
-            <a class="btn btn-dark" id="back-button" href="../index.html">Back</a>
-        </div>
-    </nav>
-    <div class="container-fluid">
-        <div class="row pb-2">
-            <button class="btn btn-warning" id='getSourcesBtn'>Get Video Sources 📸</button>
-            <div class="px-3"><button class="btn btn-info" id='saveBtn' disabled="true">Save Recording 💾</button></div>
-            <button class="btn btn-danger" id="newRecordingBtn" disabled="true">Start New Recording 🗑</button>
-        </div>
-        <div class="row pt-2 justify-content-center">
-            <button class="btn btn-primary" id='startBtn' disabled="true">Start ⏺</button>
-            <div class="px-3"><button class="btn btn-info" id='pauseBtn' disabled="true">Pause ⏸</button></div>
-            <button class="btn btn-danger" id='stopBtn' disabled="true">Stop ⏹</button>
-        </div>
-        <div id="transcribedTextElement"></div>
-        <div id="finalTranscribedTextElement"></div>
+  <nav class="navbar navbar-dark bg-dark fixed-top">
+    <div id="window-left" class="d-inline-block">
+      <a id="btn-back" class="btn btn-light" href="index.html"></a>
+      <span id="page-title" class="navbar-text">Docked Toolbar Mode</span>
     </div>
+    <span id="app-name" class="navbar-brand" href="#">TextronAI</span>
+    <div id="window-options">
+      <a id="btn-minimize" class="window-option btn btn-light"></a>
+      <a id="btn-maximize" class="window-option btn btn-warning"></a>
+      <a id="btn-close" class="window-option btn btn-danger"></a>
+    </div>
+  </nav>
+  <div class="container-fluid">
+    <div class="row pb-2">
+      <button class="btn btn-warning" id='getSourcesBtn'>Get Video Sources 📸</button>
+      <div class="px-3"><button class="btn btn-info" id='saveBtn' disabled="true">Save Recording 💾</button></div>
+      <button class="btn btn-danger" id="newRecordingBtn" disabled="true">Start New Recording 🗑</button>
+    </div>
+    <div class="row pt-2 justify-content-center">
+      <button class="btn btn-primary" id='startBtn' disabled="true">Start ⏺</button>
+      <div class="px-3"><button class="btn btn-info" id='pauseBtn' disabled="true">Pause ⏸</button></div>
+      <button class="btn btn-danger" id='stopBtn' disabled="true">Stop ⏹</button>
+    </div>
+    <div id="transcribedTextElement"></div>
+    <div id="finalTranscribedTextElement"></div>
+  </div>
 </body>
+
 </html>

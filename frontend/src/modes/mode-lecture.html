@@ -5,21 +5,28 @@
   <meta charset="UTF-8">
   <title>Lecture Mode</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="../lib/bootstrap4.5.2.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+  <link rel="stylesheet" href="../lib/bootstrap4.5.2.min.css">
   <link rel="stylesheet" href="../lib/quill.snow.1.3.6.css">
+  <link rel="stylesheet" href="./css/navbar.css">
   <link rel="stylesheet" href="./mode-lecture.css">
-  <script defer src="../lib/jquery.2.2.2.min.js"></script>
   <script defer src="../lib/quill.1.3.6.js"></script>
   <script defer src="mode-editor.js"></script>
   <script defer src="./mode-lecture-render.js"></script>
+  <script defer src="js/navbar.js"></script>
+  <script defer src="../lib/jquery.2.2.2.min.js"></script>
 </head>
 
 <body>
   <nav class="navbar navbar-dark bg-dark fixed-top">
-    <span class="navbar-brand" href="#">TextronAI</span>
-    <span class="navbar-text">Screen Recorder</span>
-    <div class="float-right">
-      <a class="btn btn-dark" id="back-button" href="../index.html">Back</a>
+    <div id="window-left" class="d-inline-block">
+      <a id="btn-back" class="btn btn-light" href="index.html"></a>
+      <span id="page-title" class="navbar-text">Lecture Mode</span>
+    </div>
+    <span id="app-name" class="navbar-brand" href="#">TextronAI</span>
+    <div id="window-options">
+      <a id="btn-minimize" class="window-option btn btn-light"></a>
+      <a id="btn-maximize" class="window-option btn btn-warning"></a>
+      <a id="btn-close" class="window-option btn btn-danger"></a>
     </div>
   </nav>
   <div class="container-fluid">
@@ -29,7 +36,7 @@
           <div class="">
             <button class="btn btn-warning mb-1" id='getSourcesBtn'>Get Video Sources 📸</button>
             <div id="timeKeeper" class="btn btn-info mb-1">
-              <span id="hours">00</span>:<span id="minutes">00</span>:<span id="seconds">00.0</span>
+              <span id="hours">00</span>:<span id="minutes">00</span>:<span id="seconds">00.00</span>
             </div>
           </div>
           <div class="row justify-content-center py-2">
