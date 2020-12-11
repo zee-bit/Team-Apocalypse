@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../lib/bootstrap4.5.2.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <link rel="stylesheet" href="./css/navbar.css">
+    <link rel="stylesheet" href="./mode-player.css">
+    <script defer src="../lib/jquery.2.2.2.min.js"></script>
+    <script defer type="module" src="mode-player.js"></script>
+    <script defer src="js/navbar.js"></script>
+    <title>Player Mode</title>
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-dark fixed-top">
+        <div id="window-left" class="d-inline-block">
+          <a id="btn-back" class="btn btn-light" href="index.html"></a>
+          <span id="page-title" class="navbar-text">Player Mode</span>
+        </div>
+        <span id="app-name" class="navbar-brand" href="#">TextronAI</span>
+        <div id="window-options">
+          <a id="btn-minimize" class="window-option btn btn-success"></a>
+          <a id="btn-maximize" class="window-option btn btn-warning"></a>
+          <a id="btn-close" class="window-option btn btn-danger"></a>
+        </div>
+      </nav>
+    <div class="row container-fluid">
+        <div class="col video-container">
+            <video id="video" controls width="1000" height="630"></video>
+        </div>
+        <div id="filesList" class="col">
+            
+        </div>
+    </div>
+</body>
+</html>
