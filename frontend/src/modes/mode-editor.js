@@ -1,33 +1,16 @@
-let quill = new Quill('#editor-container', {
-    modules: {
-        toolbar: [
-            [{ header: [1, 2, 3, false] }],
-            ['bold', 'italic', 'underline'],
-            ['link', 'blockquote', 'code-block', 'image'],
-            [{ list: 'ordered' }, { list: 'bullet' }]
-        ]
-    },
-    placeholder: 'Start writing here...',
-    theme: 'snow'  // or 'bubble'
-});
+let fs = require('fs')
+import {html, render} from '../../node_modules/lit-html/lit-html.js'
 
-function saveRichText() {
-    let htmlToRtf = require('html-to-rtf')
-    let element = document.createElement('a')
-    let filename = `rtf-${Date.now()}.rtf`
-    let notesHTML = quill.root.innerHTML;
+let filesListContainer = document.getElementById('filesList')
 
-    notesRTF = htmlToRtf.convertHtmlToRtf(notesHTML)
-    element.setAttribute('href', 'data:application/octet-stream,' + encodeURIComponent(notesRTF));
-    element.setAttribute('download', filename);
-    element.style.display = 'none';
-    
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
-}
+let files = fs.readdirSync('../Saved Texts', {withFileTypes: true})
+console.log(files)
 
-function loadRichText() {
+let fullFilesList = constructContainer(files)
+render(fullFilesList, filesListContainer)
+
+
+function loadRichTextFromList(file) {
     // Requires system specific utility download for 'unrtf' engine.
     // Python engine does not require any download but it doesnt 
     // work for me, but you can try it yourself by passing
@@ -35,25 +18,54 @@ function loadRichText() {
     // [https://www.npmjs.com/package/unrtf]
     let unrtf = require('unrtf')
     unrtf.defaultEngine = 'unrtf'
-    let element = document.createElement('input')
-    element.setAttribute('type', 'file')
-    element.style.display = 'none'
 
-    element.addEventListener('change', () => {
-        const fileReader = new FileReader()
-        fileReader.addEventListener('load', () => {
-            let rtf = fileReader.result
-            console.log(rtf)
-            unrtf(rtf, (err, res) => {
-                if(err) throw err
-                console.log(res.html)
-                quill.root.innerHTML = res.html
-            })
-        })
-        fileReader.readAsText(element.files[0], 'ascii')
+    // const fileReader = new FileReader()
+    // fileReader.addEventListener('load', () => {
+    //     let rtf = fileReader.result
+    //     console.log(rtf)
+    //     unrtf(rtf, (err, res) => {
+    //         if(err) throw err
+    //         console.log(res.html)
+    //         quill.root.innerHTML = res.html
+    //     })
+    // })
+    // fileReader.readAsText(file, 'ascii')
+    // fileReader.readAsArrayBuffer(file)
+
+    let rtf = fs.readFileSync(file, {encoding: 'ascii'})
+    unrtf(rtf, (err, res) => {
+        if(err) throw err
+        console.log(res.html)
+        quill.root.innerHTML = res.html
     })
+}
 
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
+function constructContainer(files) {
+
+    const listener = {
+        handleEvent(e) {
+          let fileName = e.path[0].id
+          fileName = '../Saved Texts/' + fileName
+          loadRichTextFromList(fileName)
+        },
+        capture: true,
+      };
+
+    let filesContanierHTML = 
+    html`${files.map((file) => 
+        html`<div class="row justify-content-center">
+                <div class="card border-success align-items-center">
+                    <div class="card-content">
+                        <div class="content">
+                            <a class="name" id="${file.name}" 
+                                data-toggle="tooltip" title="${file.name}" 
+                                @click="${listener}">${file.name}</a>
+                            <div class="description">${file.type}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>`
+        )}`;
+        console.log(filesContanierHTML)
+    return filesContanierHTML
 }

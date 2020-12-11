@@ -6,7 +6,7 @@ body {
 
 .editor-container {
     width: 100%;
-    min-height: 65vh;
+    min-height: 55vh;
 }
 
 /* .back-button {
@@ -14,3 +14,18 @@ body {
     right: 50px;
     top: 77px;
 } */
+
+.card {
+    width: 80%;
+    margin: .5rem;
+    padding: .3rem;
+}
+
+.name {
+    font-size: large;
+}
+
+#filesList {
+    display: inline-block;
+    overflow-x: hidden;
+}

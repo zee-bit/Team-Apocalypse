@@ -36,12 +36,12 @@ function constructContainer(files) {
     let filesContanierHTML = 
     html`${files.map((file) => 
         html`<div class="row justify-content-center">
-                <div class="card align-items-center">
+                <div class="card border-success align-items-center">
                     <div class="card-content">
                         <div class="content">
-                            <h4 class="name" id="${file.name}" 
+                            <a class="name" id="${file.name}" 
                                 data-toggle="tooltip" title="${file.name}" 
-                                @click="${listener}">${file.name}</h4>
+                                @click="${listener}">${file.name}</a>
                             <div class="description">${file.type}</div>
                         </div>
                     </div>
