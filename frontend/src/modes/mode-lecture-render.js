@@ -13,7 +13,6 @@ ipcRenderer.invoke(SUDO_ENLARGE)
 
 const getSourcesBtn = document.getElementById("getSourcesBtn")
 const startBtn = document.getElementById("startBtn")
-const pauseBtn = document.getElementById("pauseBtn")
 const stopBtn = document.getElementById("stopBtn")
 const saveBtn = document.getElementById("saveBtn")
 const newRecordingBtn = document.getElementById("newRecordingBtn")
@@ -35,6 +34,7 @@ let sliceIndex = -1
 let totalDuration = 0
 let finalTranscribedText = {}
 let finalFilePaths = []
+let TRANSCRIPTION_ENABLED = true
 
 
 
@@ -46,10 +46,12 @@ let finalFilePaths = []
 let refreshInterval = 50
 let baseTime = 0
 let timeElapsedTillPause = 0
+let timeKeeper
 
 timeKeeperReset = () => {
   baseTime = 0
   timeElapsedTillPause = 0
+  timeKeeper = undefined
   timeKeeperUpdateElements(["00", "00", "00.00"])
 }
 
@@ -96,26 +98,23 @@ timeKeeperUpdateElements = (data = timeKeeperGetTimeElapsed()) => {
 }
 
 guiUpdateOnStop = () => {
-  startBtn.innerText = "Start"
+  startBtn.innerText = "Start ⏺"
   startBtn.setAttribute("disabled", "true")
-  pauseBtn.setAttribute("disabled", "true")
   stopBtn.setAttribute("disabled", "true")
   saveBtn.removeAttribute("disabled")
 }
 
 guiUpdateOnResume = () => {
-  pauseBtn.innerText = "Pause ⏸"
+  startBtn.innerText = "Pause ⏸"
 }
 
 guiUpdateOnPause = () => {
-  pauseBtn.innerText = "Resume ▶"
+  startBtn.innerText = "Resume ▶"
 }
 
 guiUpdateOnStart = () => {
-  startBtn.innerText = "Recording"
+  startBtn.innerText = "Pause ⏸"
   getSourcesBtn.setAttribute("disabled", "true")
-  startBtn.setAttribute("disabled", "true")
-  pauseBtn.removeAttribute("disabled")
   stopBtn.removeAttribute("disabled")
   newRecordingBtn.removeAttribute("disabled")
 }
@@ -134,13 +133,14 @@ guiUpdateOnSourceUnavailable = error => {
 
 guiUpdateOnNew = () => {
   getSourcesBtn.removeAttribute("disabled")
+  startBtn.innerText = "Start ⏺"
   if (mediaRecorder != undefined)
     startBtn.removeAttribute("disabled")
-  pauseBtn.setAttribute("disabled", "true")
   stopBtn.setAttribute("disabled", "true")
   saveBtn.setAttribute("disabled", "true")
   newRecordingBtn.setAttribute("disabled", "true")
   transcribedTextElement.innerHTML = ""
+  timeKeeperStop()
   timeKeeperReset()
 }
 
@@ -151,6 +151,16 @@ guiUpdateOnNew = () => {
 
 // --------------------Assigning events to buttons-------------------
 
+[startBtn, stopBtn, newRecordingBtn].forEach(btn => btn.addEventListener("click", () => console.log(baseTime, timeElapsedTillPause, timeKeeper)))
+
+document.getElementById("transcribeBtn").onclick = e => {
+  if (TRANSCRIPTION_ENABLED)
+    e.target.innerHTML = "Transcription Off"
+  else
+    e.target.innerHTML = "Transcription On"
+  TRANSCRIPTION_ENABLED = !TRANSCRIPTION_ENABLED
+}
+
 saveBtn.onclick = e => ipcRenderer.invoke(SAVE_PATH)
 
 stopBtn.onclick = e => {
@@ -158,38 +168,38 @@ stopBtn.onclick = e => {
   guiUpdateOnStop()
 }
 
-pauseBtn.onclick = e => {
-  if (mediaRecorder.state == "recording") {
+startBtn.onclick = e => {
+  console.log(mediaRecorder.state)
+  if (mediaRecorder.state == "inactive" || mediaRecorder.state == "stopped") {
+    if (timeslice)
+      mediaRecorder.start(timeslice)
+    else
+      mediaRecorder.start()
+    guiUpdateOnStart()
+  } else if (mediaRecorder.state == "recording") {
     mediaRecorder.pause()
     guiUpdateOnPause()
-  }
-  else if (mediaRecorder.state == "paused") {
+  } else if (mediaRecorder.state == "paused") {
     mediaRecorder.resume()
     guiUpdateOnResume()
   }
-}
-
-startBtn.onclick = e => {
-  if (timeslice)
-    mediaRecorder.start(timeslice)
-  else
-    mediaRecorder.start()
-  guiUpdateOnStart()
 }
 
 getSourcesBtn.onclick = (event) => ipcRenderer.invoke(DISPLAY_SOURCES)
 
 
 handleNewRecording = (event) => {
-  if (finalFilePaths != [])
-    deleteFiles(finalFilePaths)
-  finalFilePaths = []
   chunks = []
   sliceIndex = -1
   totalDuration = 0
   finalTranscribedText = {}
   guiUpdateOnNew()
-
+  if (mediaRecorder != undefined)
+    if (mediaRecorder.state == "paused" || mediaRecorder.state == "recording")
+      mediaRecorder.stop()
+  if (finalFilePaths != [])
+    deleteFiles(finalFilePaths)
+  finalFilePaths = []
 }
 newRecordingBtn.onclick = handleNewRecording
 
@@ -378,7 +388,8 @@ const handleRecordingStart = (e) => {
 const handleDataAvailable = (e) => {
   sliceIndex++
   chunks.push(e.data)
-  convertToBuffer(chunks, totalDuration.toFixed(3), sliceIndex)
+  if (TRANSCRIPTION_ENABLED)
+    convertToBuffer(chunks, totalDuration.toFixed(3), sliceIndex)
   return
 }
 
