@@ -24,8 +24,8 @@ const finalTranscribedTextElement = document.getElementById("finalTranscribedTex
 let mediaRecorder
 let chunks = []
 let timeslice = 5000
-let tempDirectory = path.join(__dirname, "../../../backend/temp/")
-let scriptDirectory = path.join(__dirname, "../../../backend/scripts/")
+let tempDirectory = path.join(__dirname, "..", "..", "..", "backend", "temp")
+let scriptDirectory = path.join(__dirname, "..", "..", "..", "backend", "scripts")
 let sliceIndex = -1
 let totalDuration = 0
 let wavDurations = {}
@@ -194,7 +194,7 @@ getLastWavDuration = (wavFilePath, chunkIndex) => {
 callClient = (query, webmFilePath, wavFilePath, wavFileName, chunkIndex) => {
 
   let options = {
-    scriptPath: path.join(__dirname, "/../../../backend"),
+    scriptPath: path.join(__dirname, "", "..", "..", "..", "backend"),
     args: [query, wavFilePath]
   }
 

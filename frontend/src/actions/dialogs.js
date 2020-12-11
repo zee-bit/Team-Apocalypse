@@ -8,7 +8,7 @@ exports.handleSavePath = async (e) => {
   const { filePath } = await dialog.showSaveDialog({
     title: 'Save Video As mp4',
     buttonLabel: 'Save video',
-    defaultPath: path.join(__dirname, "../../../Recordings/" ,`TextronAI-${Date.now()}.mp4`)
+    defaultPath: path.join(__dirname, "..", "..", "..", "Recordings", `TextronAI-${Date.now()}.mp4`)
   })
   e.sender.send(SAVE_PATH, filePath)
 }

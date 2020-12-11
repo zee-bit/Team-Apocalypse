@@ -1,44 +1,44 @@
-exports.createTempFolder = () => {
-  const { DEVELOPER_MODE } = require('./flags')
-  const path = require('path')
-  const fs = require('fs');
-  const tempDir = path.join(__dirname, "../../../backend/temp")
+const path = require('path')
+const fs = require('fs')
+const { DEVELOPER_MODE, DELETE_FILES, TEMP_CLEAR_ON_CLOSE } = require(path.join(__dirname, "flags"))
 
-  fs.access(tempDir, fs.constants.F_OK, (err) => {
-    if (err)
-      fs.mkdir(tempDir, (err) => {
-        if (DEVELOPER_MODE)
-          console.log(`${err ? err : "Temp created successfully."}`)
-      });
-  });
+exports.createFolder = (folderPath) => {
+  fs.promises.access(folderPath, fs.constants.F_OK)
+    .catch(async () => {
+      fs.promises.mkdir(folderPath)
+        .catch((error) => {
+          if (DEVELOPER_MODE)
+            console.error("Creating Folder error:", error)
+        })
+    })
 }
 
 exports.deleteFiles = (fileList) => {
-  const { DEVELOPER_MODE, DELETE_FILES } = require('./flags')
   if (!(DEVELOPER_MODE && !DELETE_FILES)) {
-    const fs = require('fs')
-    fileList.forEach(path => {
-      fs.unlink(path, (err) => {
-        if (DEVELOPER_MODE && err)
-          alert(err)
-        if (err)
-          return
-      })
+    fileList.forEach(filePath => {
+      fs.promises.unlink(filePath)
+        .catch((error) => { if (DEVELOPER_MODE) console.error("Deleting FIle", error) })
     })
   }
 }
 
-clearTemp = () => {
-  const { DEVELOPER_MODE, TEMP_CLEAR_ON_CLOSE } = require('../actions/flags')
+exports.clearFolder = async (folderPath, options = {}) => {
   if (!(DEVELOPER_MODE && !TEMP_CLEAR_ON_CLOSE)) {
-    const fs = require('fs')
-    const path = require('path')
-    const tempDir = path.join(__dirname, "../../backend/temp")
+    try {
+      const fileList = await fs.promises.readdir(folderPath, { withFileTypes: true });
 
-    let fileList = fs.readdirSync(tempDir)
-    fileList.forEach(fileName => {
-      fileName = path.join(tempDir, fileName)
-      fs.unlinkSync(fileName)
-    })
+      if (("directory" in options && options.directory) || !("directory" in options)) {
+        fileList.filter(dirent => dirent.isDirectory()).forEach(dirent => {
+          fs.promises.rmdir(path.join(folderPath, dirent.name))
+            .catch(error => { if (DEVELOPER_MODE) console.error("Deleting directory:", error) })
+        })
+      }
+      if (("file" in options && options.file) || !("file" in options)) {
+        fileList.filter(dirent => dirent.isFile()).forEach(dirent => {
+          fs.promises.unlink(path.join(folderPath, dirent.name))
+            .catch(error => { if (DEVELOPER_MODE) console.error("Deleting file:", error) })
+        })
+      }
+    } catch (error) { if (DEVELOPER_MODE) console.error("Listing files error:", error) }
   }
 }
