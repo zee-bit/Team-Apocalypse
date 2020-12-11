@@ -14,7 +14,8 @@ ipcRenderer.invoke(SUDO_ENLARGE)
 const getSourcesBtn = document.getElementById("getSourcesBtn")
 const startBtn = document.getElementById("startBtn")
 const stopBtn = document.getElementById("stopBtn")
-const saveBtn = document.getElementById("saveBtn")
+const saveMp3Btn = document.getElementById("saveMp3Btn")
+const saveMp4Btn = document.getElementById("saveMp4Btn")
 const newRecordingBtn = document.getElementById("newRecordingBtn")
 const videoElement = document.getElementsByTagName("video")[0]
 const transcribedTextElement = document.getElementById("transcribedTextElement")
@@ -101,7 +102,8 @@ guiUpdateOnStop = () => {
   startBtn.innerText = "Start ⏺"
   startBtn.setAttribute("disabled", "true")
   stopBtn.setAttribute("disabled", "true")
-  saveBtn.removeAttribute("disabled")
+  saveMp3Btn.removeAttribute("disabled")
+  saveMp4Btn.removeAttribute("disabled")
 }
 
 guiUpdateOnResume = () => {
@@ -137,7 +139,8 @@ guiUpdateOnNew = () => {
   if (mediaRecorder != undefined)
     startBtn.removeAttribute("disabled")
   stopBtn.setAttribute("disabled", "true")
-  saveBtn.setAttribute("disabled", "true")
+  saveMp3Btn.setAttribute("disabled", "true")
+  saveMp4Btn.setAttribute("disabled", "true")
   newRecordingBtn.setAttribute("disabled", "true")
   transcribedTextElement.innerHTML = ""
   timeKeeperStop()
@@ -161,7 +164,8 @@ document.getElementById("transcribeBtn").onclick = e => {
   TRANSCRIPTION_ENABLED = !TRANSCRIPTION_ENABLED
 }
 
-saveBtn.onclick = e => ipcRenderer.invoke(SAVE_PATH)
+saveMp3Btn.onclick = e => ipcRenderer.invoke(SAVE_PATH, ".mp3")
+saveMp4Btn.onclick = e => ipcRenderer.invoke(SAVE_PATH, ".mp4")
 
 stopBtn.onclick = e => {
   mediaRecorder.stop()
@@ -236,6 +240,21 @@ handleLastWavDuration = (duration, chunkIndex) => {
 // ---------------------------Linkers---------------------------
 
 // Convert to mp4
+
+const saveAsMp3 = (inputFileName, outputFileName) => {
+  const { PythonShell } = require("python-shell")
+  const path = require("path")
+
+  let options = {
+    scriptPath: scriptDirectory,
+    args: [inputFileName, outputFileName]
+  }
+
+  let webm_to_mp3 = new PythonShell('webm_to_mp3.py', options)
+  webm_to_mp3.on('message', (message) => {
+    return
+  })
+}
 
 const saveAsMp4 = (inputFileName, outputFileName) => {
   const { PythonShell } = require("python-shell")
@@ -319,15 +338,15 @@ saveAsWav = (webmFilePath, wavFilePath, startTime, wavFileName, chunkIndex) => {
 
 // Saving the file after getting saved path from the Dialog box through IPC
 
-saveLecture = (e, savePath) => {
+saveRecording = (e, savePath, saveFormat) => {
   if (savePath != '') {
-    if (savePath.slice(-4) != ".mp4")
-      savePath += ".mp4"
-    saveAsMp4(finalFilePaths[0], savePath)
+    if (savePath.slice(-1 * saveFormat.length) != saveFormat)
+      savePath += saveFormat
+    saveFormat == ".mp3" ? saveAsMp3(finalFilePaths[0], savePath) : saveAsMp4(finalFilePaths[0], savePath)
   }
   return
 }
-ipcRenderer.on(SAVE_PATH, saveLecture)
+ipcRenderer.on(SAVE_PATH, saveRecording)
 
 
 

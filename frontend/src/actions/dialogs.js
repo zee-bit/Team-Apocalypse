@@ -1,16 +1,26 @@
 const { desktopCapturer, dialog } = require('electron')
 const path = require('path')
+const { title } = require('process')
 const { DISPLAY_SOURCES, SAVE_PATH } = require('./ipcChannels')
 
 // Saving the video dialog
 
-exports.handleSavePath = async (e) => {
+exports.handleSavePath = async (e, saveFormat) => {
+  if (saveFormat == ".mp3") {
+    dialogTitle = "Save Recording As mp3"
+    defaultFileName = `TextronAI-AUD-${Date.now()}.mp3`
+  }
+  else if (saveFormat == ".mp4") {
+    title = "Save Recording As mp4"
+    defaultFileName = `TextronAI-VID-${Date.now()}.mp4`
+  }
+
   const { filePath } = await dialog.showSaveDialog({
-    title: 'Save Video As mp4',
-    buttonLabel: 'Save video',
-    defaultPath: path.join(__dirname, "..", "..", "..", "Recordings", `TextronAI-${Date.now()}.mp4`)
+    title: dialogTitle,
+    buttonLabel: 'Save Recording',
+    defaultPath: path.join(__dirname, "..", "..", "..", "Recordings", defaultFileName)
   })
-  e.sender.send(SAVE_PATH, filePath)
+  e.sender.send(SAVE_PATH, filePath, saveFormat)
 }
 
 // Exit dialog
