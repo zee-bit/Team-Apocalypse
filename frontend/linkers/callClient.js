@@ -4,13 +4,13 @@ exports.callClient = (query, filePath, startPosition) => {
   const { ipcRenderer } = require('electron') // For IPC
 
   let options = {
-    scriptPath: path.join(__dirname, "/../../backend"),
+    scriptPath: path.join(__dirname, "..", "..", "backend"),
     args: [query, filePath]
   }
 
   let callClient = new PythonShell('client.py', options)
   callClient.on('message', (message) => {
     // console.log(startPosition, message)
-    ipcRenderer.invoke("TRANSCRIBED",startPosition,message)
+    ipcRenderer.invoke("TRANSCRIBED", startPosition, message)
   })
 }

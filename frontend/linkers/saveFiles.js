@@ -4,13 +4,13 @@ exports.saveAsWav = (inputFilePath, outputFilePath, startPosition) => {
   const { callClient } = require('./callClient')
 
   let options = {
-    scriptPath: path.join(__dirname, "/../../backend/scripts"),
+    scriptPath: path.join(__dirname, "..", "..", "backend", "scripts"),
     args: [inputFilePath, outputFilePath, startPosition]
   }
 
   let webm_to_wav = new PythonShell('webm_to_wav.py', options)
   webm_to_wav.on('message', (message) => {
-    console.log(startPosition, "Wave: ", message.slice(-26,-4))
+    console.log(startPosition, "Wave: ", message.slice(-26, -4))
     return callClient("all_at_once", outputFilePath, startPosition)
     console.log(startPosition, "Sent to client")
   })
@@ -23,27 +23,12 @@ exports.saveAsWav = (inputFilePath, outputFilePath, startPosition) => {
   // })
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 exports.saveAsMp4 = (inputFilePath, outputFilePath) => {
   const { PythonShell } = require("python-shell")
   const path = require("path")
 
   let options = {
-    scriptPath: path.join(__dirname, "/../../backend/scripts"),
+    scriptPath: path.join(__dirname, "..", "..", "backend", "scripts"),
     args: [inputFilePath, outputFilePath]
   }
 
