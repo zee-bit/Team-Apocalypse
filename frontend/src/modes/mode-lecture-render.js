@@ -1,7 +1,8 @@
 const path = require('path') // For joining paths
 const { writeFile } = require('fs') // Save video to disk
 const { PythonShell } = require("python-shell") // Run python scripts
-const { ipcRenderer } = require('electron') // For IPC
+const { ipcRenderer, desktopCapturer } = require('electron') // For IPC
+// const { handleDisplaySources } = require('../actions/displaySources')
 const { DISPLAY_SOURCES, SAVE_PATH, SUDO_ENLARGE } = require(path.join(__dirname, "..", "actions", "ipcChannels")) // Main Procsses name constants (path relative to the html file)
 const { DEVELOPER_MODE, FINAL_TRANSCRIBED_TEXT_SHOW } = require(path.join(__dirname, "..", "actions", "flags"))
 const { deleteFiles } = require(path.join(__dirname, "..", "actions", "utilityFunctions"))
@@ -11,7 +12,10 @@ ipcRenderer.invoke(SUDO_ENLARGE)
 
 // DOM Elements
 
-const getSourcesBtn = document.getElementById("getSourcesBtn")
+const currentSource = document.getElementById("currentSource")
+const diaplaySourcesBtn = document.getElementById("displaySourcesBtn")
+const displaySourceSpinner = document.getElementById("displaySourceSpinner")
+const sourceMenu = document.getElementById("sourceMenu")
 const startBtn = document.getElementById("startBtn")
 const stopBtn = document.getElementById("stopBtn")
 const saveMp3Btn = document.getElementById("saveMp3Btn")
@@ -116,7 +120,7 @@ guiUpdateOnPause = () => {
 
 guiUpdateOnStart = () => {
   startBtn.innerText = "Pause ⏸"
-  getSourcesBtn.setAttribute("disabled", "true")
+  displaySourcesBtn.setAttribute("disabled", "true")
   stopBtn.removeAttribute("disabled")
   newRecordingBtn.removeAttribute("disabled")
 }
@@ -124,7 +128,7 @@ guiUpdateOnStart = () => {
 guiUpdateOnSourceAvailable = (videoStream, sourceName) => {
   videoElement.srcObject = videoStream
   videoElement.play()
-  getSourcesBtn.innerText = sourceName
+  currentSource.innerText = sourceName
   startBtn.removeAttribute('disabled')
 }
 
@@ -134,7 +138,7 @@ guiUpdateOnSourceUnavailable = error => {
 }
 
 guiUpdateOnNew = () => {
-  getSourcesBtn.removeAttribute("disabled")
+  displaySourcesBtn.removeAttribute("disabled")
   startBtn.innerText = "Start ⏺"
   if (mediaRecorder != undefined)
     startBtn.removeAttribute("disabled")
@@ -188,9 +192,6 @@ startBtn.onclick = e => {
     guiUpdateOnResume()
   }
 }
-
-getSourcesBtn.onclick = (event) => ipcRenderer.invoke(DISPLAY_SOURCES)
-
 
 handleNewRecording = (event) => {
   chunks = []
@@ -459,20 +460,59 @@ const setUpRecorder = (videoStream) => {
 
 // Function to set up stream on GUI using constraints
 
-const setupStream = async (e, selectedSource) => {
+const setupStream = async (e) => {
 
+  let constraints = {
+    audio: {
+      mandatory: {
+        chromeMediaSource: 'desktop'
+      }
+    },
+    video: {
+      mandatory: {
+        chromeMediaSource: 'desktop',
+        chromeMediaSourceId: e.target.dataset.id
+      }
+    }
+  }
   let videoStream
   try {
-    videoStream = await navigator.mediaDevices.getUserMedia(selectedSource.constraints)
+    videoStream = await navigator.mediaDevices.getUserMedia(constraints)
   } catch (err) {
     guiUpdateOnSourceUnavailable(err)
     return
   }
-
   // Sending stream to media recorder
   setUpRecorder(videoStream)
-
   // Update Stream source in GUI
-  guiUpdateOnSourceAvailable(videoStream, selectedSource.name)
+  guiUpdateOnSourceAvailable(videoStream, e.target.dataset.name)
 }
-ipcRenderer.on(DISPLAY_SOURCES, setupStream)
+
+// ipcRenderer.on(DISPLAY_SOURCES, setupStream)
+// getSourcesBtn.onclick = (event) => ipcRenderer.invoke(DISPLAY_SOURCES)
+
+const populateMenu = inputSources => {
+  sourceMenu.innerHTML = ""
+  inputSources.forEach(source => {
+    let node = document.createElement("div")
+    node.appendChild(document.createTextNode(source.name))
+    node.classList = "dropdown-item source-item"
+    node.onclick = setupStream
+    node.dataset.id = source.id
+    node.dataset.name = source.name
+    sourceMenu.appendChild(node)
+  })
+  displaySourceSpinner.style.visibility = "hidden"
+}
+
+const handleDisplaySources = async (e) => {
+
+  // Gets the names of the available screens and windows
+
+  displaySourceSpinner.style.visibility = "visible"
+  const inputSources = await desktopCapturer.getSources({
+    types: ['window', 'screen']
+  });
+  populateMenu(inputSources)
+}
+document.getElementById("displaySourcesBtn").onclick = handleDisplaySources

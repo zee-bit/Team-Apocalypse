@@ -11,7 +11,7 @@ exports.handleSavePath = async (e, saveFormat) => {
     defaultFileName = `TextronAI-AUD-${Date.now()}.mp3`
   }
   else if (saveFormat == ".mp4") {
-    title = "Save Recording As mp4"
+    dialogTitle = "Save Recording As mp4"
     defaultFileName = `TextronAI-VID-${Date.now()}.mp4`
   }
 
