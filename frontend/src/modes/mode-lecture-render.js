@@ -1,7 +1,8 @@
 const path = require('path') // For joining paths
 const { writeFile } = require('fs') // Save video to disk
 const { PythonShell } = require("python-shell") // Run python scripts
-const { ipcRenderer } = require('electron') // For IPC
+const { ipcRenderer, desktopCapturer } = require('electron') // For IPC
+// const { handleDisplaySources } = require('../actions/displaySources')
 const { DISPLAY_SOURCES, SAVE_PATH, SUDO_ENLARGE } = require(path.join(__dirname, "..", "actions", "ipcChannels")) // Main Procsses name constants (path relative to the html file)
 const { DEVELOPER_MODE, FINAL_TRANSCRIBED_TEXT_SHOW } = require(path.join(__dirname, "..", "actions", "flags"))
 const { deleteFiles } = require(path.join(__dirname, "..", "actions", "utilityFunctions"))
@@ -11,11 +12,14 @@ ipcRenderer.invoke(SUDO_ENLARGE)
 
 // DOM Elements
 
-const getSourcesBtn = document.getElementById("getSourcesBtn")
+const currentSource = document.getElementById("currentSource")
+const diaplaySourcesBtn = document.getElementById("displaySourcesBtn")
+const displaySourceSpinner = document.getElementById("displaySourceSpinner")
+const sourceMenu = document.getElementById("sourceMenu")
 const startBtn = document.getElementById("startBtn")
-const pauseBtn = document.getElementById("pauseBtn")
 const stopBtn = document.getElementById("stopBtn")
-const saveBtn = document.getElementById("saveBtn")
+const saveMp3Btn = document.getElementById("saveMp3Btn")
+const saveMp4Btn = document.getElementById("saveMp4Btn")
 const newRecordingBtn = document.getElementById("newRecordingBtn")
 const videoElement = document.getElementsByTagName("video")[0]
 const transcribedTextElement = document.getElementById("transcribedTextElement")
@@ -35,6 +39,7 @@ let sliceIndex = -1
 let totalDuration = 0
 let finalTranscribedText = {}
 let finalFilePaths = []
+let TRANSCRIPTION_ENABLED = true
 
 
 
@@ -46,10 +51,12 @@ let finalFilePaths = []
 let refreshInterval = 50
 let baseTime = 0
 let timeElapsedTillPause = 0
+let timeKeeper
 
 timeKeeperReset = () => {
   baseTime = 0
   timeElapsedTillPause = 0
+  timeKeeper = undefined
   timeKeeperUpdateElements(["00", "00", "00.00"])
 }
 
@@ -96,26 +103,24 @@ timeKeeperUpdateElements = (data = timeKeeperGetTimeElapsed()) => {
 }
 
 guiUpdateOnStop = () => {
-  startBtn.innerText = "Start"
+  startBtn.innerText = "Start ⏺"
   startBtn.setAttribute("disabled", "true")
-  pauseBtn.setAttribute("disabled", "true")
   stopBtn.setAttribute("disabled", "true")
-  saveBtn.removeAttribute("disabled")
+  saveMp3Btn.removeAttribute("disabled")
+  saveMp4Btn.removeAttribute("disabled")
 }
 
 guiUpdateOnResume = () => {
-  pauseBtn.innerText = "Pause ⏸"
+  startBtn.innerText = "Pause ⏸"
 }
 
 guiUpdateOnPause = () => {
-  pauseBtn.innerText = "Resume ▶"
+  startBtn.innerText = "Resume ▶"
 }
 
 guiUpdateOnStart = () => {
-  startBtn.innerText = "Recording"
-  getSourcesBtn.setAttribute("disabled", "true")
-  startBtn.setAttribute("disabled", "true")
-  pauseBtn.removeAttribute("disabled")
+  startBtn.innerText = "Pause ⏸"
+  displaySourcesBtn.setAttribute("disabled", "true")
   stopBtn.removeAttribute("disabled")
   newRecordingBtn.removeAttribute("disabled")
 }
@@ -123,7 +128,7 @@ guiUpdateOnStart = () => {
 guiUpdateOnSourceAvailable = (videoStream, sourceName) => {
   videoElement.srcObject = videoStream
   videoElement.play()
-  getSourcesBtn.innerText = sourceName
+  currentSource.innerText = sourceName
   startBtn.removeAttribute('disabled')
 }
 
@@ -133,14 +138,16 @@ guiUpdateOnSourceUnavailable = error => {
 }
 
 guiUpdateOnNew = () => {
-  getSourcesBtn.removeAttribute("disabled")
+  displaySourcesBtn.removeAttribute("disabled")
+  startBtn.innerText = "Start ⏺"
   if (mediaRecorder != undefined)
     startBtn.removeAttribute("disabled")
-  pauseBtn.setAttribute("disabled", "true")
   stopBtn.setAttribute("disabled", "true")
-  saveBtn.setAttribute("disabled", "true")
+  saveMp3Btn.setAttribute("disabled", "true")
+  saveMp4Btn.setAttribute("disabled", "true")
   newRecordingBtn.setAttribute("disabled", "true")
   transcribedTextElement.innerHTML = ""
+  timeKeeperStop()
   timeKeeperReset()
 }
 
@@ -151,45 +158,53 @@ guiUpdateOnNew = () => {
 
 // --------------------Assigning events to buttons-------------------
 
-saveBtn.onclick = e => ipcRenderer.invoke(SAVE_PATH)
+[startBtn, stopBtn, newRecordingBtn].forEach(btn => btn.addEventListener("click", () => console.log(baseTime, timeElapsedTillPause, timeKeeper)))
+
+document.getElementById("transcribeBtn").onclick = e => {
+  if (TRANSCRIPTION_ENABLED)
+    e.target.innerHTML = "Transcription Off"
+  else
+    e.target.innerHTML = "Transcription On"
+  TRANSCRIPTION_ENABLED = !TRANSCRIPTION_ENABLED
+}
+
+saveMp3Btn.onclick = e => ipcRenderer.invoke(SAVE_PATH, ".mp3")
+saveMp4Btn.onclick = e => ipcRenderer.invoke(SAVE_PATH, ".mp4")
 
 stopBtn.onclick = e => {
   mediaRecorder.stop()
   guiUpdateOnStop()
 }
 
-pauseBtn.onclick = e => {
-  if (mediaRecorder.state == "recording") {
+startBtn.onclick = e => {
+  console.log(mediaRecorder.state)
+  if (mediaRecorder.state == "inactive" || mediaRecorder.state == "stopped") {
+    if (timeslice)
+      mediaRecorder.start(timeslice)
+    else
+      mediaRecorder.start()
+    guiUpdateOnStart()
+  } else if (mediaRecorder.state == "recording") {
     mediaRecorder.pause()
     guiUpdateOnPause()
-  }
-  else if (mediaRecorder.state == "paused") {
+  } else if (mediaRecorder.state == "paused") {
     mediaRecorder.resume()
     guiUpdateOnResume()
   }
 }
 
-startBtn.onclick = e => {
-  if (timeslice)
-    mediaRecorder.start(timeslice)
-  else
-    mediaRecorder.start()
-  guiUpdateOnStart()
-}
-
-getSourcesBtn.onclick = (event) => ipcRenderer.invoke(DISPLAY_SOURCES)
-
-
 handleNewRecording = (event) => {
-  if (finalFilePaths != [])
-    deleteFiles(finalFilePaths)
-  finalFilePaths = []
   chunks = []
   sliceIndex = -1
   totalDuration = 0
   finalTranscribedText = {}
   guiUpdateOnNew()
-
+  if (mediaRecorder != undefined)
+    if (mediaRecorder.state == "paused" || mediaRecorder.state == "recording")
+      mediaRecorder.stop()
+  if (finalFilePaths != [])
+    deleteFiles(finalFilePaths)
+  finalFilePaths = []
 }
 newRecordingBtn.onclick = handleNewRecording
 
@@ -226,6 +241,21 @@ handleLastWavDuration = (duration, chunkIndex) => {
 // ---------------------------Linkers---------------------------
 
 // Convert to mp4
+
+const saveAsMp3 = (inputFileName, outputFileName) => {
+  const { PythonShell } = require("python-shell")
+  const path = require("path")
+
+  let options = {
+    scriptPath: scriptDirectory,
+    args: [inputFileName, outputFileName]
+  }
+
+  let webm_to_mp3 = new PythonShell('webm_to_mp3.py', options)
+  webm_to_mp3.on('message', (message) => {
+    return
+  })
+}
 
 const saveAsMp4 = (inputFileName, outputFileName) => {
   const { PythonShell } = require("python-shell")
@@ -309,15 +339,15 @@ saveAsWav = (webmFilePath, wavFilePath, startTime, wavFileName, chunkIndex) => {
 
 // Saving the file after getting saved path from the Dialog box through IPC
 
-saveLecture = (e, savePath) => {
+saveRecording = (e, savePath, saveFormat) => {
   if (savePath != '') {
-    if (savePath.slice(-4) != ".mp4")
-      savePath += ".mp4"
-    saveAsMp4(finalFilePaths[0], savePath)
+    if (savePath.slice(-1 * saveFormat.length) != saveFormat)
+      savePath += saveFormat
+    saveFormat == ".mp3" ? saveAsMp3(finalFilePaths[0], savePath) : saveAsMp4(finalFilePaths[0], savePath)
   }
   return
 }
-ipcRenderer.on(SAVE_PATH, saveLecture)
+ipcRenderer.on(SAVE_PATH, saveRecording)
 
 
 
@@ -378,7 +408,8 @@ const handleRecordingStart = (e) => {
 const handleDataAvailable = (e) => {
   sliceIndex++
   chunks.push(e.data)
-  convertToBuffer(chunks, totalDuration.toFixed(3), sliceIndex)
+  if (TRANSCRIPTION_ENABLED)
+    convertToBuffer(chunks, totalDuration.toFixed(3), sliceIndex)
   return
 }
 
@@ -429,20 +460,59 @@ const setUpRecorder = (videoStream) => {
 
 // Function to set up stream on GUI using constraints
 
-const setupStream = async (e, selectedSource) => {
+const setupStream = async (e) => {
 
+  let constraints = {
+    audio: {
+      mandatory: {
+        chromeMediaSource: 'desktop'
+      }
+    },
+    video: {
+      mandatory: {
+        chromeMediaSource: 'desktop',
+        chromeMediaSourceId: e.target.dataset.id
+      }
+    }
+  }
   let videoStream
   try {
-    videoStream = await navigator.mediaDevices.getUserMedia(selectedSource.constraints)
+    videoStream = await navigator.mediaDevices.getUserMedia(constraints)
   } catch (err) {
     guiUpdateOnSourceUnavailable(err)
     return
   }
-
   // Sending stream to media recorder
   setUpRecorder(videoStream)
-
   // Update Stream source in GUI
-  guiUpdateOnSourceAvailable(videoStream, selectedSource.name)
+  guiUpdateOnSourceAvailable(videoStream, e.target.dataset.name)
 }
-ipcRenderer.on(DISPLAY_SOURCES, setupStream)
+
+// ipcRenderer.on(DISPLAY_SOURCES, setupStream)
+// getSourcesBtn.onclick = (event) => ipcRenderer.invoke(DISPLAY_SOURCES)
+
+const populateMenu = inputSources => {
+  sourceMenu.innerHTML = ""
+  inputSources.forEach(source => {
+    let node = document.createElement("div")
+    node.appendChild(document.createTextNode(source.name))
+    node.classList = "dropdown-item source-item"
+    node.onclick = setupStream
+    node.dataset.id = source.id
+    node.dataset.name = source.name
+    sourceMenu.appendChild(node)
+  })
+  displaySourceSpinner.style.visibility = "hidden"
+}
+
+const handleDisplaySources = async (e) => {
+
+  // Gets the names of the available screens and windows
+
+  displaySourceSpinner.style.visibility = "visible"
+  const inputSources = await desktopCapturer.getSources({
+    types: ['window', 'screen']
+  });
+  populateMenu(inputSources)
+}
+document.getElementById("displaySourcesBtn").onclick = handleDisplaySources
